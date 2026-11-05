@@ -2,7 +2,7 @@
 import { ClipboardList, Cpu, LayoutDashboard, Settings2, Users } from 'lucide-react';
 
 export const SECCIONES = [
-  { to: '/', etiqueta: 'Panel', icono: LayoutDashboard, end: true },
+  { to: '/panel', etiqueta: 'Panel', icono: LayoutDashboard, end: true },
   { to: '/ordenes', etiqueta: 'Órdenes', icono: ClipboardList },
   { to: '/clientes', etiqueta: 'Clientes', icono: Users },
   { to: '/repuestos', etiqueta: 'Repuestos', icono: Cpu },

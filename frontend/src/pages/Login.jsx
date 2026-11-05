@@ -22,7 +22,7 @@ export const Login = () => {
   const usarCuentaDemo = () => setValores({ correo: CUENTA_DEMO.correo, password: CUENTA_DEMO.password });
 
   // Página que el usuario intentaba abrir antes de ser enviado al login.
-  const destino = location.state?.desde ?? '/';
+  const destino = location.state?.desde ?? '/panel';
 
   // Al iniciar sesión, "usuario" cambia y este redireccionamiento lleva al destino.
   if (usuario) return <Navigate to={destino} replace />;
@@ -80,7 +80,7 @@ export const Login = () => {
         </Link>
       </p>
 
-      <div className="mt-8 flex items-center gap-3 rounded-2xl border border-dashed border-line-strong p-4 text-[13px] text-muted">
+      <div className="mt-8 flex items-center gap-3 rounded-2xl bajo:mt-5 border border-dashed border-line-strong p-4 text-[13px] text-muted">
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[10px] font-bold tracking-[0.18em] uppercase">Cuenta de demostración</p>
           <p className="mt-1.5 break-all">

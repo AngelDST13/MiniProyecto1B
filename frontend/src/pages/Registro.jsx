@@ -15,12 +15,12 @@ export const Registro = () => {
   const navigate = useNavigate();
   const { valores, errores, enviando, cambiar, enviar } = useFormState({ nombre: '', correo: '', password: '' });
 
-  if (usuario) return <Navigate to="/" replace />;
+  if (usuario) return <Navigate to="/panel" replace />;
 
   const alEnviar = enviar(async (datos) => {
     await register(datos);
     toast.exito('Cuenta creada. ¡Bienvenido al taller!');
-    navigate('/', { replace: true });
+    navigate('/panel', { replace: true });
   });
 
   const hayErrorDeCampo = errores.nombre || errores.correo || errores.password;

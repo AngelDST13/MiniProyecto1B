@@ -2,6 +2,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { RutaProtegida } from './components/RutaProtegida.jsx';
 import { AppLayout } from './components/layout/AppLayout.jsx';
+import { Inicio } from './pages/Inicio.jsx';
 import { Login } from './pages/Login.jsx';
 import { Registro } from './pages/Registro.jsx';
 import { Panel } from './pages/Panel.jsx';
@@ -15,13 +16,14 @@ import { AdminEntidad } from './pages/AdminEntidad.jsx';
 export const App = () => (
   <Routes>
     {/* Públicas */}
+    <Route index element={<Inicio />} />
     <Route path="/login" element={<Login />} />
     <Route path="/registro" element={<Registro />} />
 
     {/* Protegidas: sin token redirigen a /login */}
     <Route element={<RutaProtegida />}>
       <Route element={<AppLayout />}>
-        <Route index element={<Panel />} />
+        <Route path="panel" element={<Panel />} />
         <Route path="ordenes" element={<Ordenes />} />
         <Route path="clientes" element={<Clientes />} />
         <Route path="repuestos" element={<Componentes />} />

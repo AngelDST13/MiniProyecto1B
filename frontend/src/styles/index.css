@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Pantallas bajas (laptops de 768 px o navegador con zoom): variante "bajo:" */
+@custom-variant bajo (@media (max-height: 780px));
+
 /* =====================================================================
    Tokens de diseño · "Bancada"
    Inspiración: la mesa de trabajo del taller. Papel de orden de servicio,
@@ -62,6 +65,13 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Desplazamiento suave para los enlaces #flujo, #funciones… (solo si no se pidió reducir movimiento) */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   body {
     @apply bg-paper font-sans text-ink antialiased;
     /* Tapete de trabajo: retícula de puntos muy sutil */
@@ -92,6 +102,20 @@
     height: 1px;
   }
 
+  /* Revelado al hacer scroll (ver hooks/useRevelar.js). Sin JS el contenido se ve igual. */
+  .revelar {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--retraso, 0ms);
+  }
+  .revelar[data-visible='true'] {
+    opacity: 1;
+    transform: none;
+  }
+
   .scrollbar-fino {
     scrollbar-width: thin;
     scrollbar-color: var(--color-line-strong) transparent;
@@ -102,5 +126,9 @@
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .revelar {
+    opacity: 1;
+    transform: none;
   }
 }

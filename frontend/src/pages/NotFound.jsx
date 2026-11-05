@@ -12,7 +12,7 @@ export const NotFound = () => (
         to="/"
         className="mt-6 inline-flex h-11 items-center rounded-xl bg-ink px-5 text-sm font-semibold text-paper hover:bg-ink-soft"
       >
-        Volver al panel
+        Volver al inicio
       </Link>
     </div>
   </div>

@@ -1,97 +1,70 @@
 // Marco de las pantallas de acceso (login y registro).
-// Escritorio: panel oscuro con una "orden de servicio" ilustrada + formulario.
-// Móvil: solo el formulario.
+// La pantalla ocupa exactamente el alto de la ventana: la página nunca se desplaza.
+// Si el formulario no cabe (pantallas muy bajas), solo su columna se desplaza por dentro.
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { Logo } from './Logo.jsx';
-import { ESTADOS, ESTADO_ESTILO } from '../../constants/dominio.js';
+import { TicketIlustrado } from './TicketIlustrado.jsx';
 
-const TicketIlustrado = () => (
-  <div className="relative w-full max-w-sm rotate-[-3deg] rounded-3xl bg-paper p-6 text-ink shadow-[0_40px_80px_-30px_rgb(0_0_0/0.7)]">
-    <div className="flex items-center justify-between">
-      <span className="font-mono text-xs font-bold tracking-widest text-muted">ORDEN DE SERVICIO</span>
-      <span className="font-mono text-xs font-bold text-signal-deep">OS-0042</span>
-    </div>
-    <p className="mt-4 font-display text-2xl font-extrabold">ThinkPad T14 Gen 3</p>
-    <p className="font-mono text-xs text-muted">S/N PF-4K9X21 · Laptop</p>
+const PanelIlustrado = () => (
+  <section className="relative hidden h-dvh flex-col overflow-hidden bg-ink px-12 py-10 text-paper lg:flex bajo:py-7">
+    {/* Retícula de banco de trabajo */}
+    <div
+      className="pointer-events-none absolute inset-0 opacity-[0.08]"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgb(255 255 255) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255) 1px, transparent 1px)',
+        backgroundSize: '44px 44px',
+      }}
+      aria-hidden
+    />
+    <div className="pointer-events-none absolute -right-24 -bottom-24 size-96 rounded-full bg-signal/25 blur-3xl" aria-hidden />
 
-    <div className="perforado my-5" />
+    <Link to="/" className="relative w-fit" aria-label="Ir a la página de inicio">
+      <Logo claro />
+    </Link>
 
-    <ol className="space-y-3">
-      {ESTADOS.map((estado, indice) => {
-        const completado = indice <= 2;
-        return (
-          <li key={estado} className="flex items-center gap-3 text-sm">
-            <span
-              className={`grid size-5 place-items-center rounded-full border-2 ${
-                completado ? `${ESTADO_ESTILO[estado].border} ${ESTADO_ESTILO[estado].dot}` : 'border-line-strong'
-              }`}
-            >
-              {completado && <span className="size-1.5 rounded-full bg-white" />}
-            </span>
-            <span className={completado ? 'font-semibold' : 'text-muted'}>{estado}</span>
-            {indice === 2 && (
-              <span className="ml-auto rounded-full bg-st-reparado-soft px-2 py-0.5 text-[11px] font-bold text-st-reparado">
-                Listo para retirar
-              </span>
-            )}
-          </li>
-        );
-      })}
-    </ol>
-
-    <div className="perforado my-5" />
-    <div className="flex items-end justify-between">
+    <div className="relative grid min-h-0 flex-1 items-center gap-10 py-8 xl:grid-cols-[1fr_auto]">
       <div>
-        <p className="text-xs text-muted">Repuestos</p>
-        <p className="text-sm font-semibold">Pantalla 14" IPS · Pasta térmica</p>
+        <p className="font-mono text-xs font-bold tracking-[0.2em] text-signal uppercase">Taller de computación</p>
+        {/* El tamaño depende de la altura de la ventana para que siempre quepa */}
+        <h2 className="mt-4 max-w-md text-[clamp(2.25rem,6.4vh,3.75rem)] leading-[0.98] font-extrabold">
+          Cada equipo, de la recepción a la entrega.
+        </h2>
+        <p className="mt-5 max-w-sm text-[15px] text-paper/60 bajo:mt-3">
+          Clientes, órdenes de servicio y repuestos en un mismo lugar. Sin papeles perdidos.
+        </p>
       </div>
-      <p className="font-display text-xl font-extrabold">$128.50</p>
+      {/* El ticket solo aparece cuando hay espacio de sobra */}
+      <TicketIlustrado className="hidden xl:block bajo:hidden" />
     </div>
-  </div>
+
+    <p className="relative font-mono text-[11px] text-paper/40">Mini Proyecto 1 · Node.js + React</p>
+  </section>
 );
 
 export const AuthShell = ({ titulo, subtitulo, children }) => (
-  <div className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
-    <section className="relative hidden overflow-hidden bg-ink px-12 py-10 text-paper lg:flex lg:flex-col">
-      {/* Retícula de banco de trabajo */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgb(255 255 255) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255) 1px, transparent 1px)',
-          backgroundSize: '44px 44px',
-        }}
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute -right-24 -bottom-24 size-96 rounded-full bg-signal/25 blur-3xl" aria-hidden />
+  <div className="grid h-dvh overflow-hidden lg:grid-cols-[1.05fr_1fr]">
+    <PanelIlustrado />
 
-      <div className="relative">
-        <Logo claro />
-      </div>
-
-      <div className="relative my-auto grid gap-12 py-12 xl:grid-cols-[1fr_auto] xl:items-center">
-        <div>
-          <p className="font-mono text-xs font-bold tracking-[0.2em] text-signal uppercase">Taller de computación</p>
-          <h2 className="mt-4 max-w-md text-5xl leading-[0.98] font-extrabold xl:text-6xl">
-            Cada equipo, de la recepción a la entrega.
-          </h2>
-          <p className="mt-5 max-w-sm text-[15px] text-paper/60">
-            Clientes, órdenes de servicio y repuestos en un mismo lugar. Sin papeles perdidos.
-          </p>
+    <section className="scrollbar-fino h-dvh overflow-y-auto overscroll-contain">
+      <div className="flex min-h-full flex-col px-5 py-6 sm:px-10 sm:py-8 bajo:py-5">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="lg:hidden" aria-label="Ir a la página de inicio">
+            <Logo />
+          </Link>
+          <Link
+            to="/"
+            className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-muted transition hover:text-ink"
+          >
+            <ArrowLeft className="size-4" aria-hidden /> Inicio
+          </Link>
         </div>
-        <TicketIlustrado />
-      </div>
-
-      <p className="relative font-mono text-[11px] text-paper/40">Mini Proyecto 1 · Node.js + React</p>
-    </section>
-
-    <section className="flex flex-col px-5 py-8 sm:px-10">
-      <div className="lg:hidden">
-        <Logo />
-      </div>
-      <div className="mx-auto my-auto w-full max-w-sm animate-rise py-10">
-        <h1 className="text-4xl font-extrabold">{titulo}</h1>
-        <p className="mt-2 text-[15px] text-muted">{subtitulo}</p>
-        <div className="mt-8">{children}</div>
+        <div className="mx-auto my-auto w-full max-w-sm animate-rise py-8 bajo:py-4">
+          <h1 className="text-4xl font-extrabold bajo:text-3xl">{titulo}</h1>
+          <p className="mt-2 text-[15px] text-muted">{subtitulo}</p>
+          <div className="mt-8 bajo:mt-5">{children}</div>
+        </div>
       </div>
     </section>
   </div>
