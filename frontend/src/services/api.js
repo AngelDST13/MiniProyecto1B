@@ -22,11 +22,12 @@ export const tokenStorage = {
 };
 
 export class ApiError extends Error {
-  constructor(message, status, details) {
+  constructor(message, status, details, code) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.details = details; // errores por campo: { nombre: '...', email: '...' }
+    this.code = code; // código del backend, por ejemplo CORREO_NO_VERIFICADO
   }
 }
 
@@ -34,7 +35,7 @@ export class ApiError extends Error {
 const leerError = (cuerpo) => {
   const error = cuerpo?.error;
   if (typeof error === 'string') return { message: error };
-  return { message: error?.message ?? 'Ocurrió un error inesperado', details: error?.details };
+  return { message: error?.message ?? 'Ocurrió un error inesperado', details: error?.details, code: error?.code };
 };
 
 /**
@@ -74,8 +75,8 @@ export const request = async (path, { method = 'GET', body, auth = true } = {}) 
       tokenStorage.clear();
       window.dispatchEvent(new Event(EVENTO_SESION_VENCIDA));
     }
-    const { message, details } = leerError(cuerpo);
-    throw new ApiError(message, respuesta.status, details);
+    const { message, details, code } = leerError(cuerpo);
+    throw new ApiError(message, respuesta.status, details, code);
   }
 
   return cuerpo;

@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
+import { esPersonal, rutaInicio } from '../../utils/roles.js';
 import { Logo } from '../layout/Logo.jsx';
 
 const REPOSITORIO = 'https://github.com/AngelDST13/MiniProyecto1B';
@@ -20,10 +21,10 @@ export const CierreInicio = () => {
             </h2>
             <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
               <Link
-                to={usuario ? '/panel' : '/registro'}
+                to={usuario ? rutaInicio(usuario) : '/registro'}
                 className="inline-flex h-12 items-center gap-2 rounded-xl bg-signal px-6 text-[15px] font-semibold text-white transition hover:bg-[#f04c12]"
               >
-                {usuario ? 'Ir al panel' : 'Crear cuenta'} <ArrowRight className="size-4" aria-hidden />
+                {usuario ? (esPersonal(usuario) ? 'Ir al panel' : 'Mi cuenta') : 'Crear cuenta'} <ArrowRight className="size-4" aria-hidden />
               </Link>
               {!usuario && (
                 <Link to="/login" className="inline-flex h-12 items-center rounded-xl border border-white/20 px-6 text-[15px] font-semibold hover:border-white/50">

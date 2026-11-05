@@ -1,9 +1,13 @@
-// Envuelve las rutas privadas: sin sesión, redirige a /login (recordando a dónde iba).
+// Envuelve las rutas privadas:
+//  - sin sesión → /login (recordando a dónde iba)
+//  - con un rol que no corresponde → a su página de inicio
+//  - cliente sin cédula (cuenta de Google) → /completar-perfil
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
+import { rutaInicio } from '../utils/roles.js';
 import { Loader } from './ui/Loader.jsx';
 
-export const RutaProtegida = () => {
+export const RutaProtegida = ({ roles }) => {
   const { usuario, cargando } = useAuth();
   const location = useLocation();
 
@@ -15,8 +19,10 @@ export const RutaProtegida = () => {
     );
   }
 
-  if (!usuario) {
-    return <Navigate to="/login" replace state={{ desde: location.pathname }} />;
+  if (!usuario) return <Navigate to="/login" replace state={{ desde: location.pathname + location.search }} />;
+  if (roles && !roles.includes(usuario.rol)) return <Navigate to={rutaInicio(usuario)} replace />;
+  if (!usuario.perfil_completo && location.pathname !== '/completar-perfil') {
+    return <Navigate to="/completar-perfil" replace state={{ desde: location.pathname }} />;
   }
 
   return <Outlet />;

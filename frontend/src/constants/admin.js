@@ -1,17 +1,18 @@
 // Constantes visuales del módulo de Administración.
 import {
-  Building2, CalendarClock, ClipboardList, Cpu, CreditCard, FileText, GraduationCap, Hammer, HardHat,
-  NotebookPen, Receipt, ShieldCheck, ShoppingCart, Tag, Tags, Truck, UserCog, Users, Wallet, Wrench,
+  Building2, CalendarClock, ClipboardList, Cpu, CreditCard, FileCheck, FileText, GraduationCap, Hammer, HardHat,
+  LayoutGrid, NotebookPen, Receipt, ShieldCheck, ShoppingBag, ShoppingCart, Tag, Tags, Truck, UserCog, Users, Wallet, Wrench,
 } from 'lucide-react';
 
 // El backend envía el nombre del icono; aquí se traduce al componente.
 export const ICONOS = {
-  Building2, CalendarClock, ClipboardList, Cpu, CreditCard, FileText, GraduationCap, Hammer, HardHat,
-  NotebookPen, Receipt, ShieldCheck, ShoppingCart, Tag, Tags, Truck, UserCog, Users, Wallet, Wrench,
+  Building2, CalendarClock, ClipboardList, Cpu, CreditCard, FileCheck, FileText, GraduationCap, Hammer, HardHat,
+  LayoutGrid, NotebookPen, Receipt, ShieldCheck, ShoppingBag, ShoppingCart, Tag, Tags, Truck, UserCog, Users, Wallet, Wrench,
 };
 
 export const ORDEN_GRUPOS = [
   'Atención y servicio',
+  'Tienda',
   'Compras e inventario',
   'Personal y sedes',
   'Finanzas',

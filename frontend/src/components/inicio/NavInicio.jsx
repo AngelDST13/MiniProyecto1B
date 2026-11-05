@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
+import { esPersonal, rutaInicio } from '../../utils/roles.js';
 import { Logo } from '../layout/Logo.jsx';
 
 const ENLACES = [
+  { href: '/tienda', texto: 'Tienda' },
   { href: '#flujo', texto: 'Flujo' },
   { href: '#funciones', texto: 'Funciones' },
   { href: '#modulos', texto: 'Módulos' },
@@ -48,8 +50,8 @@ export const NavInicio = () => {
         </ul>
 
         {usuario ? (
-          <Link to="/panel" className="inline-flex h-10 items-center gap-2 rounded-xl bg-signal px-4 text-sm font-semibold text-white transition hover:bg-[#f04c12]">
-            Ir al panel <ArrowRight className="size-4" aria-hidden />
+          <Link to={rutaInicio(usuario)} className="inline-flex h-10 items-center gap-2 rounded-xl bg-signal px-4 text-sm font-semibold text-white transition hover:bg-[#f04c12]">
+            {esPersonal(usuario) ? 'Ir al panel' : 'Mi cuenta'} <ArrowRight className="size-4" aria-hidden />
           </Link>
         ) : (
           <div className="flex items-center gap-2">

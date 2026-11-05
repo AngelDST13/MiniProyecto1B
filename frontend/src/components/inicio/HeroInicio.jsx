@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, TriangleAlert, Wallet } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
+import { esPersonal, rutaInicio } from '../../utils/roles.js';
 import { TicketIlustrado } from '../layout/TicketIlustrado.jsx';
 
 const CIFRAS = [
@@ -54,10 +55,10 @@ export const HeroInicio = () => {
           </p>
           <div className="mt-9 flex animate-rise flex-wrap gap-3 [animation-delay:180ms]">
             <Link
-              to={usuario ? '/panel' : '/registro'}
+              to={usuario ? rutaInicio(usuario) : '/registro'}
               className="inline-flex h-12 items-center gap-2 rounded-xl bg-signal px-6 text-[15px] font-semibold text-white shadow-[0_10px_30px_-10px_rgb(255_90_31/0.9)] transition hover:bg-[#f04c12] active:scale-[0.98]"
             >
-              {usuario ? 'Ir al panel' : 'Crear cuenta'} <ArrowRight className="size-4" aria-hidden />
+              {usuario ? (esPersonal(usuario) ? 'Ir al panel' : 'Mi cuenta') : 'Crear cuenta'} <ArrowRight className="size-4" aria-hidden />
             </Link>
             {!usuario && (
               <Link

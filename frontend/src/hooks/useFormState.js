@@ -29,7 +29,8 @@ export const useFormState = (valoresIniciales) => {
     try {
       await accion(valores);
     } catch (error) {
-      setErrores(error.details ? { ...error.details, _form: error.message } : { _form: error.message });
+      // _codigo permite reaccionar a casos concretos (por ejemplo CORREO_NO_VERIFICADO)
+      setErrores(error.details ? { ...error.details, _form: error.message, _codigo: error.code } : { _form: error.message, _codigo: error.code });
     } finally {
       setEnviando(false);
     }
