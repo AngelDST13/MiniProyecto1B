@@ -2,6 +2,7 @@
 // y devuelve respuestas JSON con un formato consistente.
 import { ClienteModel } from '../models/clienteModel.js';
 import { OrdenModel } from '../models/ordenModel.js';
+import { contarDependientes, describirDependencias } from '../models/crudModel.js';
 import { validarCliente } from '../validators/clienteValidator.js';
 import { AppError } from '../utils/AppError.js';
 import { assertValido } from '../utils/assertValido.js';
@@ -68,6 +69,16 @@ export const deleteCliente = async (req, res) => {
   if (totalOrdenes > 0) {
     throw new AppError(
       `No se puede eliminar: el cliente tiene ${totalOrdenes} orden(es) de servicio registradas`,
+      409,
+      'HAS_DEPENDENCIES',
+    );
+  }
+
+  // Tablas del módulo de Administración que apuntan al cliente (por ejemplo, citas)
+  const dependencias = await contarDependientes('clientes', id);
+  if (dependencias.length > 0) {
+    throw new AppError(
+      `No se puede eliminar: el cliente tiene registros relacionados (${describirDependencias(dependencias)})`,
       409,
       'HAS_DEPENDENCIES',
     );

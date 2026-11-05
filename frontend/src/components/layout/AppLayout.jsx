@@ -35,7 +35,7 @@ const Sidebar = () => {
       </p>
 
       <nav aria-label="Principal" className="flex-1 space-y-1 px-3">
-        {SECCIONES.map(({ to, etiqueta, icono: Icono, end }) => (
+        {SECCIONES.map(({ to, etiqueta, etiquetaLarga, icono: Icono, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -53,7 +53,7 @@ const Sidebar = () => {
                   aria-hidden
                 />
                 <Icono className={`size-[18px] ${isActive ? 'text-signal' : ''}`} aria-hidden />
-                {etiqueta}
+                {etiquetaLarga ?? etiqueta}
               </>
             )}
           </NavLink>
@@ -109,7 +109,7 @@ const TopbarMovil = () => {
 const NavegacionMovil = () => (
   <nav
     aria-label="Principal"
-    className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-4 rounded-2xl bg-ink p-1.5 shadow-lift lg:hidden"
+    className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-5 rounded-2xl bg-ink p-1.5 shadow-lift lg:hidden"
     style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
   >
     {SECCIONES.map(({ to, etiqueta, icono: Icono, end }) => (

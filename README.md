@@ -4,8 +4,20 @@ Sistema empresarial para un **taller de computación y tecnología**: controla e
 
 - **Back end:** Node.js + Express (ES Modules) · MySQL 8 · JWT + bcrypt
 - **Front end:** React 19 + Vite + Tailwind CSS 4 · React Router
+- **Alcance:** **20 CRUDs** y **21 tablas** en MySQL.
+
+| Área | Módulos (CRUD) |
+|---|---|
+| Atención y servicio | Órdenes de servicio · Clientes · Citas · Cotizaciones · Seguimientos · Garantías |
+| Compras e inventario | Repuestos · Proveedores · Compras · Herramientas |
+| Personal y sedes | Técnicos · Especialidades · Sucursales |
+| Finanzas | Pagos · Métodos de pago · Gastos · Categorías de gasto |
+| Catálogos | Servicios · Marcas |
+| Sistema | Usuarios |
 
 ## Modelo de datos
+
+### Núcleo (órdenes, clientes y repuestos)
 
 ```mermaid
 erDiagram
@@ -52,11 +64,65 @@ erDiagram
     }
 ```
 
+### Módulo de Administración (16 tablas)
+
+```mermaid
+erDiagram
+    ESPECIALIDADES ||--o{ TECNICOS : "agrupa"
+    SUCURSALES ||--o{ TECNICOS : "emplea"
+    SUCURSALES ||--o{ HERRAMIENTAS : "guarda"
+    SUCURSALES ||--o{ CITAS : "recibe"
+    SUCURSALES ||--o{ GASTOS : "registra"
+    MARCAS ||--o{ HERRAMIENTAS : "fabrica"
+    PROVEEDORES ||--o{ COMPRAS : "factura"
+    CATEGORIAS_GASTO ||--o{ GASTOS : "clasifica"
+    METODOS_PAGO ||--o{ PAGOS : "se usa en"
+    CLIENTES ||--o{ CITAS : "agenda"
+    ORDENES_SERVICIO ||--o{ PAGOS : "recibe"
+    ORDENES_SERVICIO ||--o{ COTIZACIONES : "tiene"
+    ORDENES_SERVICIO ||--o{ GARANTIAS : "cubre"
+    ORDENES_SERVICIO ||--o{ SEGUIMIENTOS : "registra"
+    TECNICOS ||--o{ SEGUIMIENTOS : "escribe"
+```
+
+Tablas sin relaciones salientes: `servicios` (catálogo de precios) y `usuarios` (cuentas del sistema).
+
 **Reglas de negocio**
 
 - No se puede eliminar un cliente con órdenes registradas ni un repuesto que ya se usó (responde `409`).
 - Al agregar un repuesto a una orden se descuenta el stock dentro de una transacción. Si no alcanza, responde `409`.
 - Al quitar un repuesto o eliminar una orden, las unidades regresan al inventario.
+- No se puede eliminar ningún registro que otro use (una especialidad con técnicos, una orden con pagos, etc.). Responde `409` e indica qué registros lo impiden.
+- Los campos únicos (cédula, RUC, número de factura, código de herramienta…) responden `409` si se repiten.
+- Si una llave foránea apunta a un registro que no existe, responde `400`.
+- En una garantía, la fecha de fin no puede ser anterior a la de inicio. Nadie puede eliminar su propia cuenta.
+
+## Cómo funcionan los 17 CRUDs de Administración
+
+Cada entidad nueva se **declara** en un archivo de `src/models/admin/` con su tabla, sus campos y tipos, las reglas de validación (obligatorio, longitud, único, patrón) y sus relaciones. Por ejemplo:
+
+```js
+// src/models/admin/tecnicos.js
+{ clave: 'tecnicos', tabla: 'tecnicos', singular: 'Técnico', plural: 'Técnicos',
+  campos: [
+    { nombre: 'nombres', tipo: 'texto', requerido: true, min: 3, max: 100 },
+    { nombre: 'cedula', tipo: 'cedula', requerido: true, unico: true },
+    { nombre: 'especialidad_id', tipo: 'ref', ref: 'especialidades', requerido: true },
+    ...
+  ] }
+```
+
+Con esa definición, el **motor CRUD** genera todo lo demás:
+
+| Capa | Archivo | Qué hace |
+|---|---|---|
+| Modelo | `src/models/crudModel.js` | Arma las consultas SQL parametrizadas y los `JOIN` para mostrar el texto de cada relación |
+| Validación | `src/validators/crudValidator.js` | Valida cada campo según su tipo y descarta los que no están declarados |
+| Controlador | `src/controllers/crudController.js` | Los 5 endpoints. Verifica únicos y llaves foráneas, cifra contraseñas y bloquea borrados con dependencias |
+| Rutas | `src/routes/crudRoutes.js` | Monta `/api/<entidad>` detrás del middleware de autenticación |
+| Frontend | `pages/AdminEntidad.jsx` | Lee el esquema desde `/api/admin/entidades` y dibuja la tabla y el formulario |
+
+Agregar una entidad nueva requiere crear su tabla en SQL y un archivo de definición; no hay que repetir código.
 
 ## Estructura
 
@@ -64,24 +130,26 @@ erDiagram
 MiniProyecto1/
 ├── .env.example            → variables del backend (copiar como .env)
 ├── database/
-│   ├── schema.sql          → crea la BD completa con datos de prueba
-│   └── migrations/002_usuarios.sql
+│   ├── schema.sql          → crea la BD completa (21 tablas) con datos de prueba
+│   └── migrations/         → 002_usuarios.sql, 003_administracion.sql
 ├── postman/                → colección con todos los endpoints y casos 400/401/404/409
 ├── src/                    → BACKEND
 │   ├── app.js / server.js
 │   ├── config/             → env.js (valida variables), db.js (pool MySQL + transacciones)
-│   ├── models/             → clienteModel, ordenModel, componenteModel, usuarioModel
-│   ├── controllers/        → un controlador por entidad + authController
-│   ├── routes/             → rutas por entidad + authRoutes
+│   ├── models/             → clienteModel, ordenModel, componenteModel, usuarioModel, crudModel
+│   │   └── admin/          → definición de las 17 entidades de Administración
+│   ├── controllers/        → un controlador por entidad + authController, crudController, adminController
+│   ├── routes/             → rutas por entidad + authRoutes, crudRoutes, adminRoutes
 │   ├── middlewares/        → authMiddleware (JWT), errorHandler, notFound
 │   ├── validators/         → validación de entrada por entidad
 │   └── utils/
 └── frontend/               → FRONT END
     ├── .env.example        → VITE_API_URL
     └── src/
-        ├── components/     → ui/, layout/, clientes/, ordenes/, componentes/, RutaProtegida.jsx
+        ├── components/     → ui/, layout/, clientes/, ordenes/, componentes/, admin/, RutaProtegida.jsx
         ├── context/        → AuthContext.jsx (token y usuario), ToastContext.jsx
-        ├── pages/          → Login, Registro, Panel, Ordenes, Clientes, Componentes
+        ├── pages/          → Login, Registro, Panel, Ordenes, Clientes, Componentes,
+        │                     Administracion (los 20 módulos), AdminEntidad (CRUD genérico)
         ├── services/       → api.js (token + errores) y un servicio por entidad
         ├── hooks/ · constants/ · utils/ · styles/
 ```
@@ -94,7 +162,7 @@ MiniProyecto1/
 
 Abre MySQL Workbench, conéctate como `root` y ejecuta `database/schema.sql` completo (Ctrl+Shift+Enter).
 
-> El script **borra y recrea** la base `taller_servicio_tecnico`. Si ya la tenías del Día 1 y quieres conservar los datos, ejecuta solo `database/migrations/002_usuarios.sql`.
+> El script **borra y recrea** la base `taller_servicio_tecnico`. Si ya la tenías y quieres conservar los datos, ejecuta solo las migraciones que te falten, en orden: `002_usuarios.sql` y `003_administracion.sql`.
 
 ### 2. Backend (raíz del proyecto)
 
@@ -168,6 +236,17 @@ Las órdenes incluyen el objeto `cliente` y `total_repuestos`. `GET /api/ordenes
 | POST | `/api/ordenes/:id/componentes` | Agrega un repuesto `{ "componente_id": 2, "cantidad": 1 }` y descuenta stock (`409` si no alcanza) |
 | DELETE | `/api/ordenes/:id/componentes/:componenteId` | Quita el repuesto y devuelve el stock |
 
+### Administración (17 entidades con los mismos 5 endpoints)
+
+`/api/sucursales`, `/api/especialidades`, `/api/tecnicos`, `/api/usuarios`, `/api/marcas`, `/api/servicios`, `/api/metodos-pago`, `/api/categorias-gasto`, `/api/proveedores`, `/api/compras`, `/api/herramientas`, `/api/citas`, `/api/cotizaciones`, `/api/seguimientos`, `/api/garantias`, `/api/pagos` y `/api/gastos`.
+
+Cada relación se devuelve también como texto legible: `especialidad_id: 1` viene acompañado de `especialidad_id_etiqueta: "Microsoldadura"`.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/admin/entidades` | Esquema de los 20 módulos (campos, tipos, reglas) y su cantidad de registros |
+| GET | `/api/admin/opciones/:entidad` | `[{ id, etiqueta }]` para llenar los selectores de llaves foráneas |
+
 ### Formato de errores
 
 ```json
@@ -176,7 +255,7 @@ Las órdenes incluyen el objeto `cliente` y `total_repuestos`. `GET /api/ordenes
 
 ## Pruebas con Postman
 
-Importa `postman/MiniProyecto1.postman_collection.json` y ejecútala completa con el **Runner**. El request "Login OK" guarda el token automáticamente y los de creación guardan los ids que usan los siguientes. Son 41 requests, que incluyen los casos `400`, `401`, `404` y `409`, y al final eliminan los datos que crearon.
+Importa `postman/MiniProyecto1.postman_collection.json` y ejecútala completa con el **Runner**. El request "Login OK" guarda el token automáticamente y los de creación guardan los ids que usan los siguientes. Son 72 requests, que incluyen los casos `400`, `401`, `404` y `409` y los 17 CRUDs de Administración, y al final eliminan los datos que crearon.
 
 ## Decisiones de seguridad
 

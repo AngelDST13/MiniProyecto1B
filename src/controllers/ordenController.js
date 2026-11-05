@@ -1,6 +1,7 @@
 // Controlador de OrdenServicio y de los repuestos usados en cada orden.
 import { OrdenModel } from '../models/ordenModel.js';
 import { ClienteModel } from '../models/clienteModel.js';
+import { contarDependientes, describirDependencias } from '../models/crudModel.js';
 import {
   ESTADOS,
   validarComponenteDeOrden,
@@ -84,6 +85,16 @@ export const updateEstadoOrden = async (req, res) => {
 export const deleteOrden = async (req, res) => {
   const id = parseId(req.params.id);
   await buscarOFallar(id);
+
+  // Pagos, garantías, cotizaciones o seguimientos ligados a la orden impiden borrarla.
+  const dependencias = await contarDependientes('ordenes', id);
+  if (dependencias.length > 0) {
+    throw new AppError(
+      `No se puede eliminar: la orden tiene registros relacionados (${describirDependencias(dependencias)})`,
+      409,
+      'HAS_DEPENDENCIES',
+    );
+  }
 
   await OrdenModel.remove(id);
   res.status(200).json({ message: 'Orden eliminada correctamente' });

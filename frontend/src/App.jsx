@@ -9,6 +9,8 @@ import { Ordenes } from './pages/Ordenes.jsx';
 import { Clientes } from './pages/Clientes.jsx';
 import { Componentes } from './pages/Componentes.jsx';
 import { NotFound } from './pages/NotFound.jsx';
+import { Administracion } from './pages/Administracion.jsx';
+import { AdminEntidad } from './pages/AdminEntidad.jsx';
 
 export const App = () => (
   <Routes>
@@ -23,6 +25,8 @@ export const App = () => (
         <Route path="ordenes" element={<Ordenes />} />
         <Route path="clientes" element={<Clientes />} />
         <Route path="repuestos" element={<Componentes />} />
+        <Route path="admin" element={<Administracion />} />
+        <Route path="admin/:clave" element={<AdminEntidad />} />
       </Route>
     </Route>
 
