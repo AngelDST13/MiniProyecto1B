@@ -15,9 +15,9 @@ export const StockMeter = ({ stock }) => {
 
   return (
     <div>
-      <div className="flex gap-[3px]" role="meter" aria-valuenow={stock} aria-valuemin={0} aria-label="Stock disponible">
+      <div className="flex gap-0.75" role="meter" aria-valuenow={stock} aria-valuemin={0} aria-label="Stock disponible">
         {Array.from({ length: SEGMENTOS }, (_, indice) => (
-          <span key={indice} className={`h-2 flex-1 rounded-[2px] ${indice < llenos ? color : 'bg-paper-deep'}`} />
+          <span key={indice} className={`h-2 flex-1 rounded-xs ${indice < llenos ? color : 'bg-paper-deep'}`} />
         ))}
       </div>
       <p className={`mt-1.5 text-xs font-semibold ${agotado ? 'text-danger' : bajo ? 'text-[#8a5d00]' : 'text-muted'}`}>

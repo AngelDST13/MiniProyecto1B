@@ -1,9 +1,10 @@
 // Detalle completo de una orden: estado, datos del cliente y del equipo, repuestos usados.
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pencil, Phone, Trash2 } from 'lucide-react';
 import { ordenService } from '../../services/ordenService.js';
 import { componenteService } from '../../services/componenteService.js';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useToast } from '../../hooks/useToast.js';
+import { useCargaAsync } from '../../hooks/useCargaAsync.js';
 import { TIPO_EQUIPO_ICONO } from '../../constants/dominio.js';
 import { codigoOrden, formatDateTime } from '../../utils/format.js';
 import { Modal } from '../ui/Modal.jsx';
@@ -22,36 +23,28 @@ const Dato = ({ etiqueta, children }) => (
 
 export const OrdenDetalleModal = ({ ordenId, onClose, onActualizada, onEditar, onEliminar }) => {
   const toast = useToast();
-  const [orden, setOrden] = useState(null);
-  const [inventario, setInventario] = useState([]);
-  const [error, setError] = useState(null);
   const [ocupado, setOcupado] = useState(false);
 
   const cargar = useCallback(async () => {
-    setError(null);
-    try {
-      const [respuestaOrden, respuestaInventario] = await Promise.all([
-        ordenService.get(ordenId),
-        componenteService.list(),
-      ]);
-      setOrden(respuestaOrden.data);
-      setInventario(respuestaInventario.data);
-    } catch (err) {
-      setError(err.message);
-    }
+    const [respuestaOrden, respuestaInventario] = await Promise.all([
+      ordenService.get(ordenId),
+      componenteService.list(),
+    ]);
+    return { orden: respuestaOrden.data, inventario: respuestaInventario.data };
   }, [ordenId]);
 
-  useEffect(() => { cargar(); }, [cargar]);
+  const { datos, error, recargar, setDatos } = useCargaAsync(cargar);
+  const orden = datos?.orden ?? null;
+  const inventario = datos?.inventario ?? [];
 
   // Ejecuta una acción sobre la orden, refresca el detalle y avisa a la lista.
   const ejecutar = async (accion, mensajeExito) => {
     setOcupado(true);
     try {
       const respuesta = await accion();
-      setOrden(respuesta.data);
       onActualizada(respuesta.data);
       const inventarioActual = await componenteService.list();
-      setInventario(inventarioActual.data);
+      setDatos({ orden: respuesta.data, inventario: inventarioActual.data });
       toast.exito(mensajeExito ?? respuesta.message);
       return true;
     } catch (err) {
@@ -83,7 +76,7 @@ export const OrdenDetalleModal = ({ ordenId, onClose, onActualizada, onEditar, o
         )
       }
     >
-      {error && <ErrorState mensaje={error} onRetry={cargar} />}
+      {error && <ErrorState mensaje={error} onRetry={recargar} />}
       {!orden && !error && <Loader texto="Cargando orden…" />}
 
       {orden && (

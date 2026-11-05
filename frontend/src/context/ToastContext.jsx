@@ -1,8 +1,8 @@
 // Notificaciones breves ("toasts") para confirmar acciones o mostrar errores.
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ToastContext } from './contextos.js';
 import { CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 
-const ToastContext = createContext(null);
 const DURACION_MS = 4000;
 
 const ESTILO = {
@@ -42,7 +42,7 @@ export const ToastProvider = ({ children }) => {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-4 bottom-24 z-[60] flex flex-col items-center gap-2 lg:inset-x-auto lg:right-6 lg:bottom-6 lg:items-end"
+        className="pointer-events-none fixed inset-x-4 top-4 z-60 flex flex-col items-center gap-2 lg:inset-x-auto lg:top-auto lg:right-6 lg:bottom-24 lg:items-end"
       >
         {toasts.map(({ id, tipo, mensaje }) => {
           const { icono: Icono, color } = ESTILO[tipo];
@@ -68,10 +68,4 @@ export const ToastProvider = ({ children }) => {
       </div>
     </ToastContext.Provider>
   );
-};
-
-export const useToast = () => {
-  const contexto = useContext(ToastContext);
-  if (!contexto) throw new Error('useToast debe usarse dentro de <ToastProvider>');
-  return contexto;
 };

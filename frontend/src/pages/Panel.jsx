@@ -1,11 +1,11 @@
 // Panel principal: resumen del día del taller (indicadores, flujo, entregas y stock bajo).
-import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ClipboardList, Phone, TriangleAlert } from 'lucide-react';
 import { ordenService } from '../services/ordenService.js';
 import { clienteService } from '../services/clienteService.js';
 import { componenteService } from '../services/componenteService.js';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
+import { useCargaAsync } from '../hooks/useCargaAsync.js';
 import { ESTADOS, ESTADO_ESTILO, STOCK_BAJO, TIPO_EQUIPO_ICONO } from '../constants/dominio.js';
 import { codigoOrden, formatDate, formatMoney } from '../utils/format.js';
 import { PageHeader, ErrorState } from '../components/ui/Feedback.jsx';
@@ -21,27 +21,17 @@ const saludo = () => {
 
 const fechaLarga = new Intl.DateTimeFormat('es-EC', { weekday: 'long', day: 'numeric', month: 'long' });
 
-const useResumen = () => {
-  const [datos, setDatos] = useState(null);
-  const [error, setError] = useState(null);
-
-  const cargar = useCallback(async () => {
-    setError(null);
-    try {
-      const [ordenes, clientes, componentes] = await Promise.all([
-        ordenService.list(),
-        clienteService.list(),
-        componenteService.list(),
-      ]);
-      setDatos({ ordenes: ordenes.data, clientes: clientes.data, componentes: componentes.data });
-    } catch (err) {
-      setError(err.message);
-    }
-  }, []);
-
-  useEffect(() => { cargar(); }, [cargar]);
-  return { datos, error, recargar: cargar };
+// Definida fuera del componente: es estable y no necesita useCallback.
+const cargarResumen = async () => {
+  const [ordenes, clientes, componentes] = await Promise.all([
+    ordenService.list(),
+    clienteService.list(),
+    componenteService.list(),
+  ]);
+  return { ordenes: ordenes.data, clientes: clientes.data, componentes: componentes.data };
 };
+
+const useResumen = () => useCargaAsync(cargarResumen);
 
 const Kpi = ({ etiqueta, valor, nota, destacado = false }) => (
   <div className={`rounded-3xl p-5 ${destacado ? 'bg-ink text-paper' : 'border border-line bg-panel shadow-ticket'}`}>

@@ -1,6 +1,6 @@
 // Estado compartido por las páginas CRUD: formulario (crear/editar) y confirmación de borrado.
 import { useCallback, useState } from 'react';
-import { useToast } from '../context/ToastContext.jsx';
+import { useToast } from './useToast.js';
 
 /**
  * @param {(id: number) => Promise<{ message: string }>} eliminarFn  Servicio que elimina por id.

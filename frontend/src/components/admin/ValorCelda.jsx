@@ -50,6 +50,3 @@ export const ValorCelda = ({ campo, registro }) => {
   }
 };
 
-// Texto plano del valor (para el buscador).
-export const textoDeValor = (campo, registro) =>
-  campo.tipo === 'ref' ? registro[`${campo.nombre}_etiqueta`] ?? '' : String(registro[campo.nombre] ?? '');

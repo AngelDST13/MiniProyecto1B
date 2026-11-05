@@ -4,7 +4,7 @@ import { ESTADOS, ESTADO_ESTILO } from '../../constants/dominio.js';
 export const TicketIlustrado = ({ className = '' }) => (
   <div
     aria-hidden
-    className={`relative w-full max-w-sm rotate-[-3deg] rounded-3xl bg-paper p-6 text-ink shadow-[0_40px_80px_-30px_rgb(0_0_0/0.7)] ${className}`}
+    className={`relative w-full max-w-sm -rotate-3 rounded-3xl bg-paper p-6 text-ink shadow-[0_40px_80px_-30px_rgb(0_0_0/0.7)] ${className}`}
   >
     <div className="flex items-center justify-between gap-3">
       <span className="font-mono text-xs font-bold tracking-widest text-muted">ORDEN DE SERVICIO</span>

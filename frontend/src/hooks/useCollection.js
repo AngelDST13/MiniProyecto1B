@@ -1,27 +1,11 @@
 // Carga una lista desde la API y expone estado de carga, error y recarga.
 // "fetcher" debe ser una función estable (por ejemplo clienteService.list).
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useCargaAsync } from './useCargaAsync.js';
 
 export const useCollection = (fetcher) => {
-  const [items, setItems] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
+  const cargarLista = useCallback(async () => (await fetcher()).data, [fetcher]);
+  const { datos, error, cargando, recargar, setDatos } = useCargaAsync(cargarLista);
 
-  const recargar = useCallback(async () => {
-    setError(null);
-    try {
-      const respuesta = await fetcher();
-      setItems(respuesta.data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setCargando(false);
-    }
-  }, [fetcher]);
-
-  useEffect(() => {
-    recargar();
-  }, [recargar]);
-
-  return { items, setItems, cargando, error, recargar };
+  return { items: datos ?? [], setItems: setDatos, cargando, error, recargar };
 };

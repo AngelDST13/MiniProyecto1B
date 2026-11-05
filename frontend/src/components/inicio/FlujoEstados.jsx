@@ -13,17 +13,17 @@ export const FlujoEstados = () => (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
       <div className="revelar max-w-2xl">
         <p className="font-mono text-xs font-bold tracking-[0.2em] text-signal-deep uppercase">01 · Flujo de trabajo</p>
-        <h2 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] leading-[1] font-extrabold">Cuatro estados. Ningún equipo se pierde.</h2>
+        <h2 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] leading-none font-extrabold">Cuatro estados. Ningún equipo se pierde.</h2>
       </div>
 
       <ol className="relative mt-16 grid gap-10 md:grid-cols-4 md:gap-6">
         {/* Línea que une los pasos (solo en escritorio) */}
-        <span className="absolute top-[26px] right-[12%] left-[12%] hidden h-px bg-line-strong md:block" aria-hidden />
+        <span className="absolute top-6.5 right-[12%] left-[12%] hidden h-px bg-line-strong md:block" aria-hidden />
         {ESTADOS.map((estado, indice) => {
           const estilo = ESTADO_ESTILO[estado];
           return (
             <li key={estado} className="revelar relative" style={{ '--retraso': `${indice * 90}ms` }}>
-              <span className={`relative grid size-[52px] place-items-center rounded-2xl font-mono text-lg font-bold text-white ${estilo.dot}`}>
+              <span className={`relative grid size-13 place-items-center rounded-2xl font-mono text-lg font-bold text-white ${estilo.dot}`}>
                 {String(indice + 1).padStart(2, '0')}
               </span>
               <h3 className={`mt-6 text-xl font-bold ${estilo.text}`}>{estado}</h3>

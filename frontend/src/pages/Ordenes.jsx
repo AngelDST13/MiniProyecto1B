@@ -5,7 +5,7 @@ import { ordenService } from '../services/ordenService.js';
 import { clienteService } from '../services/clienteService.js';
 import { useCollection } from '../hooks/useCollection.js';
 import { useCrudDialogs } from '../hooks/useCrudDialogs.js';
-import { useToast } from '../context/ToastContext.jsx';
+import { useToast } from '../hooks/useToast.js';
 import { ESTADOS, ESTADO_ESTILO, TIPOS_EQUIPO, TIPO_EQUIPO_ICONO } from '../constants/dominio.js';
 import { codigoOrden, coincide } from '../utils/format.js';
 import { PageHeader, EmptyState, ErrorState } from '../components/ui/Feedback.jsx';

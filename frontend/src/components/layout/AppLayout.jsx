@@ -1,11 +1,12 @@
 // Estructura de la app autenticada: barra lateral (escritorio) o barra inferior (móvil).
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
+import { useToast } from '../../hooks/useToast.js';
 import { iniciales } from '../../utils/format.js';
 import { Logo } from './Logo.jsx';
 import { SECCIONES } from './navegacion.js';
+import { AgenteFlotante } from '../agente/AgenteFlotante.jsx';
 
 const fechaTurno = new Intl.DateTimeFormat('es-EC', { weekday: 'short', day: '2-digit', month: 'short' });
 
@@ -42,17 +43,17 @@ const Sidebar = () => {
             end={end}
             className={({ isActive }) =>
               `group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition ${
-                isActive ? 'bg-white/[0.07] text-paper' : 'text-paper/60 hover:bg-white/[0.04] hover:text-paper'
+                isActive ? 'bg-white/[0.07] text-paper' : 'text-paper/60 hover:bg-white/4 hover:text-paper'
               }`
             }
           >
             {({ isActive }) => (
               <>
                 <span
-                  className={`absolute top-2 bottom-2 left-0 w-[3px] rounded-full bg-signal transition-opacity ${isActive ? 'opacity-100' : 'opacity-0'}`}
+                  className={`absolute top-2 bottom-2 left-0 w-0.75 rounded-full bg-signal transition-opacity ${isActive ? 'opacity-100' : 'opacity-0'}`}
                   aria-hidden
                 />
-                <Icono className={`size-[18px] ${isActive ? 'text-signal' : ''}`} aria-hidden />
+                <Icono className={`size-4.5 ${isActive ? 'text-signal' : ''}`} aria-hidden />
                 {etiquetaLarga ?? etiqueta}
               </>
             )}
@@ -60,7 +61,7 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      <div className="m-3 flex items-center gap-3 rounded-2xl bg-white/[0.05] p-3">
+      <div className="m-3 flex items-center gap-3 rounded-2xl bg-white/5 p-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-signal font-display text-sm font-bold text-white">
           {iniciales(usuario?.nombre)}
         </span>
@@ -142,5 +143,6 @@ export const AppLayout = () => (
       <Outlet />
     </main>
     <NavegacionMovil />
+    <AgenteFlotante />
   </div>
 );

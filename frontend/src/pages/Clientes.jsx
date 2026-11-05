@@ -4,7 +4,7 @@ import { Mail, Pencil, Phone, Plus, Trash2, Users } from 'lucide-react';
 import { clienteService } from '../services/clienteService.js';
 import { useCollection } from '../hooks/useCollection.js';
 import { useCrudDialogs } from '../hooks/useCrudDialogs.js';
-import { useToast } from '../context/ToastContext.jsx';
+import { useToast } from '../hooks/useToast.js';
 import { coincide, iniciales } from '../utils/format.js';
 import { PageHeader, EmptyState, ErrorState } from '../components/ui/Feedback.jsx';
 import { Skeleton } from '../components/ui/Loader.jsx';
@@ -78,7 +78,7 @@ export const Clientes = () => {
     return (
       <>
         {/* Escritorio: tabla */}
-        <div className="hidden overflow-hidden rounded-3xl border border-line bg-panel shadow-ticket md:block">
+        <div className="relative hidden overflow-hidden rounded-3xl border border-line bg-panel shadow-ticket md:block">
           <table className="w-full text-left text-[15px]">
             <thead className="border-b border-line bg-paper/60 font-mono text-[11px] tracking-[0.14em] text-muted uppercase">
               <tr>

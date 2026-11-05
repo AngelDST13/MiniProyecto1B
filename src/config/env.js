@@ -37,4 +37,10 @@ export const env = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN ?? '8h',
   },
+  // Agente de IA (opcional): sin ANTHROPIC_API_KEY el resto del sistema funciona igual.
+  agente: {
+    apiKey: process.env.ANTHROPIC_API_KEY ?? '',
+    modelo: process.env.AGENTE_MODELO || 'claude-opus-5-5',
+    esfuerzo: process.env.AGENTE_ESFUERZO || 'low',
+  },
 };

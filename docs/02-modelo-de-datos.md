@@ -3,6 +3,7 @@
 Base de datos MySQL 8 `taller_servicio_tecnico`: **21 tablas**. El script completo está en [`database/schema.sql`](../database/schema.sql).
 
 Convenciones:
+
 - Todas las tablas tienen `id` autoincremental como llave primaria.
 - La mayoría incluye `created_at` y `updated_at`.
 - Las llaves foráneas usan `ON DELETE RESTRICT`: no se puede borrar un registro que otro usa, y la API responde `409`.
@@ -192,12 +193,12 @@ erDiagram
     }
 ```
 
-> GitHub y VS Code (con la extensión de Mermaid) dibujan este diagrama automáticamente. Para exportarlo como imagen, pégalo en https://mermaid.live.
+> GitHub y VS Code (con la extensión de Mermaid) dibujan este diagrama automáticamente. Para exportarlo como imagen, pégalo en <https://mermaid.live>.
 
 ## Relaciones y reglas
 
 | Relación | Tipo | Regla |
-|---|---|---|
+| --- | --- | --- |
 | Cliente → Órdenes, Citas | 1 a N | No se elimina un cliente con órdenes o citas |
 | Orden ↔ Repuestos (`orden_componentes`) | N a N | Al agregar se descuenta stock y al quitar se repone. Guarda el precio del momento |
 | Orden → Pagos, Cotizaciones, Garantías, Seguimientos | 1 a N | No se elimina una orden con registros asociados |

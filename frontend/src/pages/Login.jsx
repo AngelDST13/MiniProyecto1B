@@ -1,8 +1,8 @@
 // Inicio de sesión: envía correo y contraseña a POST /api/auth/login.
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
+import { useToast } from '../hooks/useToast.js';
 import { useFormState } from '../hooks/useFormState.js';
 import { AuthShell } from '../components/layout/AuthShell.jsx';
 import { FormError, TextInput } from '../components/ui/Field.jsx';

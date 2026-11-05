@@ -1,7 +1,7 @@
 // Portada: composición asimétrica 7/5 sobre fondo grafito, con el ticket rompiendo la grilla.
 import { Link } from 'react-router-dom';
 import { ArrowRight, TriangleAlert, Wallet } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 import { TicketIlustrado } from '../layout/TicketIlustrado.jsx';
 
 const CIFRAS = [
@@ -38,7 +38,7 @@ export const HeroInicio = () => {
         }}
         aria-hidden
       />
-      <div className="pointer-events-none absolute top-1/3 -right-40 size-[34rem] rounded-full bg-signal/20 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute top-1/3 -right-40 size-136 rounded-full bg-signal/20 blur-3xl" aria-hidden />
 
       <div className="relative mx-auto grid max-w-7xl gap-14 px-4 pt-32 pb-16 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:px-10 lg:pt-40 lg:pb-24">
         <div className="lg:col-span-7">
@@ -77,14 +77,14 @@ export const HeroInicio = () => {
             color="bg-st-diagnostico-soft text-st-diagnostico"
             titulo="Stock bajo"
             detalle="RTX 4060 8GB · 3 u."
-            className="-top-6 -left-2 rotate-[2deg] lg:-left-10"
+            className="-top-6 -left-2 rotate-2 lg:-left-10"
           />
           <AvisoFlotante
             icono={Wallet}
             color="bg-st-reparado-soft text-st-reparado"
             titulo="Pago recibido"
             detalle="$70,00 · Transferencia"
-            className="right-0 -bottom-8 rotate-[-2deg] lg:-right-4"
+            className="right-0 -bottom-8 -rotate-2 lg:-right-4"
           />
         </div>
       </div>

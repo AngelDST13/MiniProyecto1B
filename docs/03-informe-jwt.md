@@ -16,12 +16,12 @@ Un **JSON Web Token** (RFC 7519) es una forma compacta de transmitir **afirmacio
 
 Un JWT tiene tres partes en Base64URL, separadas por puntos: `HEADER.PAYLOAD.FIRMA`
 
-```
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 . eyJzdWIiOiIxIiwiaWF0IjoxNzkzODg5ODQzLCJleHAiOjE3OTM5MTg2NDN9 . 0OinTfAQ56hW...
 ```
 
 | Parte | Contenido decodificado (ejemplo real del proyecto) | Para qué sirve |
-|---|---|---|
+| --- | --- | --- |
 | **Header** | `{ "alg": "HS256", "typ": "JWT" }` | Indica el algoritmo de firma |
 | **Payload** | `{ "sub": "1", "iat": 1793889843, "exp": 1793918643 }` | Las afirmaciones: `sub` = id del usuario, `iat` = emitido en, `exp` = vence en |
 | **Firma** | `HMAC-SHA256(header + "." + payload, JWT_SECRET)` | Prueba que el token lo emitió el servidor y no fue alterado |
@@ -53,6 +53,7 @@ export const verificarToken = (token) =>
 ```
 
 Decisiones:
+
 - **Payload mínimo:** solo `sub` (id). El nombre y el correo se consultan en la base con `GET /api/auth/me`, así nunca quedan desactualizados dentro del token.
 - **`algorithms: ['HS256']` en la verificación:** evita ataques en los que alguien envía un token con `"alg": "none"` o con otro algoritmo para saltarse la firma.
 - **Login** ([`authController.js`](../src/controllers/authController.js)): se compara la contraseña con `bcrypt.compare`. Si es correcta, responde `200 { token, usuario, expiresIn }`. Si no, responde `401` con el mismo mensaje exista o no el correo, y el tiempo de respuesta también es el mismo (se compara contra un hash "señuelo"). Así no se revela qué correos están registrados.
@@ -67,13 +68,14 @@ Decisiones:
 ## 4. Dónde guardar el token en React
 
 | Opción | Ventajas | Riesgos |
-|---|---|---|
+| --- | --- | --- |
 | **localStorage** | Simple. Sobrevive a recargar y cerrar el navegador | Si hay una vulnerabilidad **XSS**, un script malicioso puede leer el token y robarlo |
 | **sessionStorage** | Se borra al cerrar la pestaña | Mismo riesgo de **XSS**. La sesión no se comparte entre pestañas |
 | **Cookie `httpOnly` + `Secure` + `SameSite`** | JavaScript **no puede leerla**, así que un XSS no roba el token | El navegador la envía sola, lo que abre la puerta a **CSRF** (se mitiga con `SameSite=Strict/Lax` o tokens anti-CSRF). Requiere configurar CORS con credenciales |
 | **Memoria (estado de React)** | No lo alcanza un script externo persistente | Se pierde al recargar la página. Normalmente se combina con un refresh token en cookie |
 
 **Decisión del proyecto: `localStorage`**, que es lo que permite y sugiere la consigna. Mitigaciones aplicadas contra XSS:
+
 - React escapa todo el texto que muestra y el proyecto **no usa** `dangerouslySetInnerHTML`.
 - No se cargan scripts de terceros. Solo se usan fuentes de Google.
 - El token dura poco (8 h) y no lleva datos sensibles.
@@ -101,6 +103,7 @@ export const authMiddleware = (req, res, next) => {
 En [`src/routes/index.js`](../src/routes/index.js), todas las rutas de entidades se montan detrás de este middleware. Solo `register` y `login` son públicas.
 
 **Frontend:**
+
 1. `api.js` agrega `Authorization: Bearer <token>` a **todas** las peticiones protegidas.
 2. `AuthContext.jsx` guarda el usuario actual y expone `login`, `register` y `logout`. Al cargar la app, valida el token guardado con `GET /api/auth/me`.
 3. `RutaProtegida.jsx` envuelve las páginas privadas. Sin sesión redirige a `/login` y, al entrar, regresa a la página que se pidió.
@@ -109,7 +112,7 @@ En [`src/routes/index.js`](../src/routes/index.js), todas las rutas de entidades
 ## 6. Buenas prácticas de seguridad aplicadas
 
 | Práctica | Cómo se aplicó |
-|---|---|
+| --- | --- |
 | Clave secreta fuerte y fuera del código | `JWT_SECRET` aleatorio de 96 caracteres hexadecimales en `.env`. El servidor **no arranca** si mide menos de 32. `.env` está en `.gitignore` y se sube solo `.env.example` |
 | Nada sensible en el payload | Solo `sub`, `iat` y `exp` |
 | Algoritmo fijo al verificar | `algorithms: ['HS256']` |
@@ -123,7 +126,7 @@ En [`src/routes/index.js`](../src/routes/index.js), todas las rutas de entidades
 ## 7. Decisión final
 
 | Tema | Decisión |
-|---|---|
+| --- | --- |
 | Algoritmo | HS256 con `JWT_SECRET` en `.env` |
 | Duración | 8 horas, sin refresh token |
 | Payload | `{ sub }` + `iat` + `exp` |
@@ -134,11 +137,11 @@ En [`src/routes/index.js`](../src/routes/index.js), todas las rutas de entidades
 
 ## Fuentes consultadas
 
-1. Jones, M., Bradley, J., Sakimura, N. (2015). *RFC 7519: JSON Web Token (JWT)*. IETF. https://datatracker.ietf.org/doc/html/rfc7519
-2. Sheffer, Y., Hardt, D., Jones, M. (2020). *RFC 8725: JSON Web Token Best Current Practices*. IETF. https://datatracker.ietf.org/doc/html/rfc8725
-3. Auth0. *Introduction to JSON Web Tokens*. https://jwt.io/introduction
-4. Auth0. *node-jsonwebtoken* (documentación de la librería). https://github.com/auth0/node-jsonwebtoken
-5. OWASP. *JSON Web Token Cheat Sheet*. https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
-6. OWASP. *HTML5 Security Cheat Sheet: Local Storage*. https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html
-7. OWASP. *Cross-Site Request Forgery Prevention Cheat Sheet*. https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
-8. MDN Web Docs. *Set-Cookie* (atributos `HttpOnly`, `Secure`, `SameSite`). https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+1. Jones, M., Bradley, J., Sakimura, N. (2015). *RFC 7519: JSON Web Token (JWT)*. IETF. <https://datatracker.ietf.org/doc/html/rfc7519>
+2. Sheffer, Y., Hardt, D., Jones, M. (2020). *RFC 8725: JSON Web Token Best Current Practices*. IETF. <https://datatracker.ietf.org/doc/html/rfc8725>
+3. Auth0. *Introduction to JSON Web Tokens*. <https://jwt.io/introduction>
+4. Auth0. *node-jsonwebtoken* (documentación de la librería). <https://github.com/auth0/node-jsonwebtoken>
+5. OWASP. *JSON Web Token Cheat Sheet*. <https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html>
+6. OWASP. *HTML5 Security Cheat Sheet: Local Storage*. <https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html>
+7. OWASP. *Cross-Site Request Forgery Prevention Cheat Sheet*. <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html>
+8. MDN Web Docs. *Set-Cookie* (atributos `HttpOnly`, `Secure`, `SameSite`). <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie>

@@ -1,9 +1,9 @@
 // Estado global de la sesión: usuario actual, token, login, registro y logout.
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AuthContext } from './contextos.js';
 import { authService } from '../services/authService.js';
 import { EVENTO_SESION_VENCIDA, tokenStorage } from '../services/api.js';
 
-const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);
@@ -62,10 +62,4 @@ export const AuthProvider = ({ children }) => {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const contexto = useContext(AuthContext);
-  if (!contexto) throw new Error('useAuth debe usarse dentro de <AuthProvider>');
-  return contexto;
 };

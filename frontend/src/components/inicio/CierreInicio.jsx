@@ -1,7 +1,7 @@
 // Llamado final y pie de página.
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 import { Logo } from '../layout/Logo.jsx';
 
 const REPOSITORIO = 'https://github.com/AngelDST13/MiniProyecto1B';

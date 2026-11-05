@@ -5,8 +5,8 @@ import { EstadoBadge } from '../ui/Badges.jsx';
 import { IconButton } from '../ui/Button.jsx';
 
 export const OrdenesTabla = ({ ordenes, onAbrir, onEditar, onEliminar }) => (
-  <div className="scrollbar-fino overflow-x-auto rounded-3xl border border-line bg-panel shadow-ticket">
-    <table className="w-full min-w-[760px] text-left text-[15px]">
+  <div className="scrollbar-fino relative overflow-x-auto rounded-3xl border border-line bg-panel shadow-ticket">
+    <table className="w-full min-w-190 text-left text-[15px]">
       <thead className="border-b border-line bg-paper/60 font-mono text-[11px] tracking-[0.14em] text-muted uppercase">
         <tr>
           <th className="px-5 py-3.5 font-bold">Orden</th>

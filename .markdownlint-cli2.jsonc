@@ -1,0 +1,11 @@
+// Configuración de markdownlint (la usan tanto `npm run lint:md` como la extensión de VS Code).
+{
+  "config": {
+    "default": true,
+    // Las líneas largas son normales en párrafos en español y en tablas: no se limita su ancho.
+    "MD013": false,
+    // Las tablas usan el estilo "compacto": | celda | celda |
+    "MD060": { "style": "compact" }
+  },
+  "ignores": ["node_modules/**", "frontend/node_modules/**"]
+}

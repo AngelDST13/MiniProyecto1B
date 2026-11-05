@@ -30,9 +30,9 @@ const MedidorStock = () => (
           <span className="font-semibold">{nombre}</span>
           <span className="font-mono text-muted">{stock} u.</span>
         </div>
-        <div className="mt-1.5 flex gap-[3px]">
+        <div className="mt-1.5 flex gap-0.75">
           {Array.from({ length: 10 }, (_, i) => (
-            <span key={i} className={`h-2 flex-1 rounded-[2px] ${i < stock ? color : 'bg-paper-deep'}`} />
+            <span key={i} className={`h-2 flex-1 rounded-xs ${i < stock ? color : 'bg-paper-deep'}`} />
           ))}
         </div>
       </div>
@@ -46,13 +46,13 @@ export const FuncionesBento = () => (
       <div className="revelar flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div className="max-w-2xl">
           <p className="font-mono text-xs font-bold tracking-[0.2em] text-signal-deep uppercase">02 · Funciones</p>
-          <h2 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] leading-[1] font-extrabold">Pensado para el mostrador y la mesa de trabajo.</h2>
+          <h2 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] leading-none font-extrabold">Pensado para el mostrador y la mesa de trabajo.</h2>
         </div>
         <p className="max-w-sm text-[15px] text-muted">Lo que se repite todos los días en un taller, resuelto en pocos clics.</p>
       </div>
 
       <div className="mt-14 grid gap-4 lg:grid-cols-12">
-        <article className="revelar flex flex-col rounded-[2rem] border border-line bg-panel p-7 shadow-ticket lg:col-span-7 lg:row-span-2 lg:p-9">
+        <article className="revelar flex flex-col rounded-4xl border border-line bg-panel p-7 shadow-ticket lg:col-span-7 lg:row-span-2 lg:p-9">
           <p className="font-mono text-[11px] font-bold tracking-[0.16em] text-muted uppercase">Tablero de órdenes</p>
           <h3 className="mt-3 max-w-md text-3xl leading-tight font-extrabold">Mueve cada equipo de columna con un clic.</h3>
           <p className="mt-3 max-w-md text-[15px] text-muted">
@@ -62,14 +62,14 @@ export const FuncionesBento = () => (
           <MiniTablero />
         </article>
 
-        <article className="revelar rounded-[2rem] border border-line bg-panel p-7 shadow-ticket lg:col-span-5" style={{ '--retraso': '80ms' }}>
+        <article className="revelar rounded-4xl border border-line bg-panel p-7 shadow-ticket lg:col-span-5" style={{ '--retraso': '80ms' }}>
           <p className="font-mono text-[11px] font-bold tracking-[0.16em] text-muted uppercase">Inventario</p>
           <h3 className="mt-3 text-2xl leading-tight font-extrabold">El stock se descuenta solo.</h3>
           <p className="mt-2 text-[15px] text-muted">Al usar un repuesto en una orden; si se retira, las unidades regresan.</p>
           <MedidorStock />
         </article>
 
-        <article className="revelar relative overflow-hidden rounded-[2rem] bg-signal p-7 text-white lg:col-span-5" style={{ '--retraso': '140ms' }}>
+        <article className="revelar relative overflow-hidden rounded-4xl bg-signal p-7 text-white lg:col-span-5" style={{ '--retraso': '140ms' }}>
           <ShieldCheck className="absolute -right-6 -bottom-6 size-40 text-white/15" aria-hidden />
           <p className="font-mono text-[11px] font-bold tracking-[0.16em] text-white/70 uppercase">Seguridad</p>
           <h3 className="mt-3 text-2xl leading-tight font-extrabold">Solo entra quien tiene cuenta.</h3>
@@ -80,7 +80,7 @@ export const FuncionesBento = () => (
           </ul>
         </article>
 
-        <article className="revelar flex items-start gap-5 rounded-[2rem] border border-line bg-panel p-7 shadow-ticket lg:col-span-12" style={{ '--retraso': '60ms' }}>
+        <article className="revelar flex items-start gap-5 rounded-4xl border border-line bg-panel p-7 shadow-ticket lg:col-span-12" style={{ '--retraso': '60ms' }}>
           <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-ink text-signal">
             <Smartphone className="size-5" aria-hidden />
           </span>

@@ -4,7 +4,7 @@ import { Package, Pencil, Plus, Trash2 } from 'lucide-react';
 import { componenteService } from '../services/componenteService.js';
 import { useCollection } from '../hooks/useCollection.js';
 import { useCrudDialogs } from '../hooks/useCrudDialogs.js';
-import { useToast } from '../context/ToastContext.jsx';
+import { useToast } from '../hooks/useToast.js';
 import { CATEGORIAS, CATEGORIA_ICONO } from '../constants/dominio.js';
 import { coincide, formatMoney } from '../utils/format.js';
 import { PageHeader, EmptyState, ErrorState } from '../components/ui/Feedback.jsx';

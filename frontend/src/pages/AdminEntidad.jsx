@@ -1,11 +1,12 @@
 // Página CRUD genérica: tabla, búsqueda, crear, editar y eliminar para cualquier
 // entidad de Administración. Las columnas y el formulario salen del esquema del backend.
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react';
 import { adminService } from '../services/adminService.js';
 import { useCrudDialogs } from '../hooks/useCrudDialogs.js';
-import { useToast } from '../context/ToastContext.jsx';
+import { useToast } from '../hooks/useToast.js';
+import { useCargaAsync } from '../hooks/useCargaAsync.js';
 import { ICONOS } from '../constants/admin.js';
 import { coincide } from '../utils/format.js';
 import { PageHeader, EmptyState, ErrorState } from '../components/ui/Feedback.jsx';
@@ -14,38 +15,38 @@ import { Button, IconButton } from '../components/ui/Button.jsx';
 import { SearchInput } from '../components/ui/SearchInput.jsx';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog.jsx';
 import { RegistroFormModal } from '../components/admin/RegistroFormModal.jsx';
-import { ValorCelda, textoDeValor } from '../components/admin/ValorCelda.jsx';
+import { ValorCelda } from '../components/admin/ValorCelda.jsx';
+import { textoDeValor } from '../utils/valores.js';
 import { NotFound } from './NotFound.jsx';
 
 const MAX_COLUMNAS = 6;
 
+// entidad: undefined = cargando · null = no existe · objeto = esquema de la entidad
 const useEntidad = (clave) => {
-  const [entidad, setEntidad] = useState(undefined); // undefined = cargando, null = no existe
-  const [registros, setRegistros] = useState([]);
-  const [error, setError] = useState(null);
-
   const cargar = useCallback(async () => {
-    setError(null);
     try {
       const [esquema, lista] = await Promise.all([adminService.entidades(), adminService.list(clave)]);
-      setEntidad(esquema.data.find((m) => m.clave === clave && !m.personalizado) ?? null);
-      setRegistros(lista.data);
+      return {
+        entidad: esquema.data.find((m) => m.clave === clave && !m.personalizado) ?? null,
+        registros: lista.data,
+      };
     } catch (err) {
-      if (err.status === 404) setEntidad(null);
-      else setError(err.message);
+      if (err.status === 404) return { entidad: null, registros: [] };
+      throw err;
     }
   }, [clave]);
 
-  useEffect(() => {
-    setEntidad(undefined);
-    cargar();
-  }, [cargar]);
-
-  return { entidad, registros, error, recargar: cargar };
+  const { datos, error, recargar } = useCargaAsync(cargar);
+  return { entidad: datos?.entidad, registros: datos?.registros ?? [], error, recargar };
 };
 
+// Al cambiar de entidad (/admin/tecnicos → /admin/pagos) la "key" reinicia todo el estado.
 export const AdminEntidad = () => {
   const { clave } = useParams();
+  return <ContenidoEntidad key={clave} clave={clave} />;
+};
+
+const ContenidoEntidad = ({ clave }) => {
   const toast = useToast();
   const { entidad, registros, error, recargar } = useEntidad(clave);
   const [busqueda, setBusqueda] = useState('');
@@ -92,8 +93,8 @@ export const AdminEntidad = () => {
 
     return (
       <>
-        {/* Escritorio: tabla */}
-        <div className="scrollbar-fino hidden overflow-x-auto rounded-3xl border border-line bg-panel shadow-ticket md:block">
+        {/* Pantallas anchas (≥1280 px): tabla */}
+        <div className="scrollbar-fino relative hidden overflow-x-auto rounded-3xl border border-line bg-panel shadow-ticket xl:block">
           <table className="w-full text-left text-[15px]">
             <thead className="border-b border-line bg-paper/60 font-mono text-[11px] tracking-[0.14em] text-muted uppercase">
               <tr>
@@ -118,8 +119,8 @@ export const AdminEntidad = () => {
           </table>
         </div>
 
-        {/* Móvil: tarjetas */}
-        <ul className="space-y-3 md:hidden">
+        {/* Móvil, tablet y laptop pequeña: tarjetas */}
+        <ul className="grid gap-3 md:grid-cols-2 xl:hidden">
           {filtrados.map((registro) => (
             <li key={registro.id} className="rounded-2xl border border-line bg-panel p-4 shadow-ticket">
               <div className="flex items-start gap-3">

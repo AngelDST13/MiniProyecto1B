@@ -5,7 +5,7 @@ Revisión contra las consignas de [`src/docs/`](../src/docs/) (Mini Proyecto 1, 
 ## Día 1: Modelado de datos e inicio del CRUD
 
 | Entregable / requisito | Estado | Dónde |
-|---|---|---|
+| --- | --- | --- |
 | Documento breve con el tema y su justificación empresarial | ✅ | [01-tema-y-justificacion.md](01-tema-y-justificacion.md) |
 | Diagrama entidad-relación con atributos y relaciones | ✅ | [02-modelo-de-datos.md](02-modelo-de-datos.md) |
 | Mínimo 3 entidades con al menos una relación | ✅ 20 entidades, 21 tablas | `database/schema.sql` |
@@ -18,7 +18,7 @@ Revisión contra las consignas de [`src/docs/`](../src/docs/) (Mini Proyecto 1, 
 ## Día 2: CRUDs completos y autenticación
 
 | Entregable / requisito | Estado | Dónde |
-|---|---|---|
+| --- | --- | --- |
 | Informe de investigación sobre el token, con fuentes | ✅ borrador, revisar antes de entregar | [03-informe-jwt.md](03-informe-jwt.md) |
 | ER actualizado con la entidad Usuario | ✅ | [02-modelo-de-datos.md](02-modelo-de-datos.md) |
 | 5 endpoints (crear, listar, ver, actualizar, eliminar) en todas las entidades | ✅ | 20 CRUDs |
@@ -42,4 +42,4 @@ Revisión contra las consignas de [`src/docs/`](../src/docs/) (Mini Proyecto 1, 
 
 1. **Estructura de carpetas:** la consigna sugiere `mini-proyecto-1/backend/` y `mini-proyecto-1/frontend/`. Aquí el backend está en la raíz del repositorio por decisión del equipo. La separación entre backend y frontend se cumple, pero si el docente exige literalmente la carpeta `backend/`, hay que mover `src/`, `package.json`, `.env*` y `scripts/` a esa carpeta.
 2. **Informe JWT:** es un borrador escrito a partir del código real. Revísalo, ajústalo con tus palabras y verifica las fuentes.
-3. **Diagrama ER:** está en formato Mermaid. Si se pide como imagen, exportarlo desde https://mermaid.live.
+3. **Diagrama ER:** está en formato Mermaid. Si se pide como imagen, exportarlo desde <https://mermaid.live>.

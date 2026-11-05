@@ -5,6 +5,7 @@ import clienteRoutes from './clienteRoutes.js';
 import ordenRoutes from './ordenRoutes.js';
 import componenteRoutes from './componenteRoutes.js';
 import adminRoutes from './adminRoutes.js';
+import agenteRoutes from './agenteRoutes.js';
 import { crearRutasCrud } from './crudRoutes.js';
 import { ENTIDADES } from '../models/admin/index.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
@@ -19,6 +20,9 @@ router.use('/auth', authRoutes);
 router.use('/clientes', authMiddleware, clienteRoutes);
 router.use('/ordenes', authMiddleware, ordenRoutes);
 router.use('/componentes', authMiddleware, componenteRoutes);
+
+// Agente de IA (consultas de solo lectura)
+router.use('/agente', authMiddleware, agenteRoutes);
 
 // Módulo de Administración: 17 CRUDs generados desde src/models/admin/*.js
 router.use('/admin', authMiddleware, adminRoutes);

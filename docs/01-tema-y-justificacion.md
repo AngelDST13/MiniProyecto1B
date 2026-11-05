@@ -26,7 +26,7 @@ Alrededor de ese flujo, el módulo de **Administración** gestiona técnicos, es
 ## Valor para la empresa
 
 | Necesidad del taller | Cómo la resuelve el sistema |
-|---|---|
+| --- | --- |
 | Saber en qué estado está cada equipo | Tablero con 4 estados (Recibido → En diagnóstico → Reparado → Entregado) |
 | Controlar el inventario | Descuento automático y transaccional del stock, más alertas de stock bajo |
 | Respaldo ante reclamos | Repuestos por orden con precio histórico, bitácora de seguimiento y garantías |

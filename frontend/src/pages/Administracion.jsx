@@ -1,8 +1,9 @@
 // Panel de Administración: los 20 módulos CRUD agrupados por área del negocio.
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { adminService } from '../services/adminService.js';
+import { useCargaAsync } from '../hooks/useCargaAsync.js';
 import { ICONOS, ORDEN_GRUPOS, rutaModulo } from '../constants/admin.js';
 import { coincide } from '../utils/format.js';
 import { PageHeader, ErrorState } from '../components/ui/Feedback.jsx';
@@ -37,23 +38,12 @@ const TarjetaModulo = ({ modulo, indice }) => {
   );
 };
 
+// Siempre se refresca: los conteos cambian al crear o eliminar registros.
+const cargarModulos = async () => (await adminService.entidades({ refrescar: true })).data;
+
 export const Administracion = () => {
-  const [modulos, setModulos] = useState(null);
-  const [error, setError] = useState(null);
+  const { datos: modulos, error, recargar: cargar } = useCargaAsync(cargarModulos);
   const [busqueda, setBusqueda] = useState('');
-
-  const cargar = useCallback(async () => {
-    setError(null);
-    try {
-      // Siempre se refresca: los conteos cambian al crear o eliminar registros.
-      const respuesta = await adminService.entidades({ refrescar: true });
-      setModulos(respuesta.data);
-    } catch (err) {
-      setError(err.message);
-    }
-  }, []);
-
-  useEffect(() => { cargar(); }, [cargar]);
 
   const grupos = useMemo(() => {
     if (!modulos) return [];

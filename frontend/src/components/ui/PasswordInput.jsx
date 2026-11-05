@@ -11,7 +11,7 @@ export const PasswordInput = (props) => {
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        className="absolute top-[29px] right-1.5 grid size-8 place-items-center rounded-lg text-muted hover:text-ink"
+        className="absolute top-7.25 right-1.5 grid size-8 place-items-center rounded-lg text-muted hover:text-ink"
         aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
       >
         {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}

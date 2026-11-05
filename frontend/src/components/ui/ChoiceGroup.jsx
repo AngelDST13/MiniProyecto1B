@@ -9,7 +9,7 @@ export const ChoiceGroup = ({ name, label, opciones, valor, onChange, error, ico
         return (
           <label
             key={opcion}
-            className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-signal/20 ${
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition has-focus-visible:ring-4 has-focus-visible:ring-signal/20 ${
               activo ? 'border-ink bg-ink text-paper' : 'border-line bg-panel text-ink-soft hover:border-line-strong'
             }`}
           >
