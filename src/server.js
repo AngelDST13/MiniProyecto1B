@@ -12,6 +12,18 @@ try {
   process.exit(1);
 }
 
-app.listen(env.port, () => {
+const servidor = app.listen(env.port, () => {
   console.log(`API del Taller de Servicio Técnico escuchando en http://localhost:${env.port}`);
+  console.log(`Frontend permitido (CORS): ${env.corsOrigins.join(', ')}`);
+});
+
+// Mensaje claro si el puerto ya está ocupado (por ejemplo, el backend ya está abierto en otra terminal).
+servidor.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`\nEl puerto ${env.port} ya está en uso: probablemente el backend YA está encendido en otra terminal.`);
+    console.error(`Compruébalo abriendo http://localhost:${env.port}/health — o cambia PORT en el archivo .env.\n`);
+  } else {
+    console.error('Error al iniciar el servidor:', error.message);
+  }
+  process.exit(1);
 });

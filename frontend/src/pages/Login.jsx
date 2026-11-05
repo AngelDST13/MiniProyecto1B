@@ -9,12 +9,17 @@ import { FormError, TextInput } from '../components/ui/Field.jsx';
 import { PasswordInput } from '../components/ui/PasswordInput.jsx';
 import { Button } from '../components/ui/Button.jsx';
 
+const CUENTA_DEMO = { correo: 'demo@bancada.com', password: 'Demo12345' };
+
 export const Login = () => {
   const { usuario, login, sesionVencida } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { valores, errores, enviando, cambiar, enviar } = useFormState({ correo: '', password: '' });
+  const { valores, errores, enviando, cambiar, enviar, setValores } = useFormState({ correo: '', password: '' });
+
+  // Rellena la cuenta de demostración (creada por database/schema.sql).
+  const usarCuentaDemo = () => setValores({ correo: CUENTA_DEMO.correo, password: CUENTA_DEMO.password });
 
   // Página que el usuario intentaba abrir antes de ser enviado al login.
   const destino = location.state?.desde ?? '/';
@@ -75,11 +80,14 @@ export const Login = () => {
         </Link>
       </p>
 
-      <div className="mt-8 rounded-2xl border border-dashed border-line-strong p-4 text-[13px] text-muted">
-        <p className="font-mono text-[10px] font-bold tracking-[0.18em] uppercase">Cuenta de demostración</p>
-        <p className="mt-1.5">
-          <span className="font-mono text-ink">demo@bancada.com</span> · <span className="font-mono text-ink">Demo12345</span>
-        </p>
+      <div className="mt-8 flex items-center gap-3 rounded-2xl border border-dashed border-line-strong p-4 text-[13px] text-muted">
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[10px] font-bold tracking-[0.18em] uppercase">Cuenta de demostración</p>
+          <p className="mt-1.5 break-all">
+            <span className="font-mono text-ink">{CUENTA_DEMO.correo}</span> · <span className="font-mono text-ink">{CUENTA_DEMO.password}</span>
+          </p>
+        </div>
+        <Button variante="borde" tamano="sm" onClick={usarCuentaDemo}>Usar cuenta</Button>
       </div>
     </AuthShell>
   );

@@ -10,7 +10,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 const app = express();
 
 // ---------- Middlewares globales ----------
-app.use(cors({ origin: env.corsOrigin }));   // Solo el frontend (Vite) puede consumir la API
+app.use(cors({ origin: env.corsOrigins }));  // Solo el frontend (Vite) puede consumir la API
 app.use(express.json({ limit: '100kb' }));    // Convierte el body JSON en req.body
 
 // ---------- Rutas ----------

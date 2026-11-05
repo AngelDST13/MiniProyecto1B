@@ -201,7 +201,24 @@ npm install
 npm run dev             # http://localhost:5173
 ```
 
-**Usuario de demostración:** `demo@bancada.com` / `Demo12345`. También puedes crear tu cuenta en `/registro`.
+### Todo con un solo comando
+
+Si ya instalaste las dependencias de los dos proyectos, desde la raíz:
+
+```bash
+npm run dev:all         # backend (3000) + frontend (5173) juntos · Ctrl+C detiene ambos
+```
+
+**Usuario de demostración:** `demo@bancada.com` / `Demo12345`. En el login, el botón **"Usar cuenta"** la rellena. También puedes crear tu cuenta en `/registro`.
+
+### Problemas comunes
+
+| Síntoma | Solución |
+|---|---|
+| `El puerto 3000 ya está en uso` | El backend ya está encendido en otra terminal. Ábrelo en http://localhost:3000/health o cierra esa terminal |
+| "No se pudo conectar con el servidor" en el login | El backend no está encendido, o la URL del frontend no está en `CORS_ORIGIN` del `.env` |
+| `No se pudo conectar a MySQL` | Inicia el servicio de MySQL (`services.msc`) y revisa `DB_USER` y `DB_PASSWORD` |
+| La cuenta demo no entra | Ejecuta `database/schema.sql` (o `migrations/002_usuarios.sql`), que es el que crea el usuario |
 
 ## API REST
 

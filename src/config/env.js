@@ -20,7 +20,11 @@ if (!Number.isInteger(port) || port <= 0) {
 
 export const env = {
   port,
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  // Lista de URLs del frontend que pueden llamar a la API (separadas por coma en .env)
+  corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173,http://127.0.0.1:5173')
+    .split(',')
+    .map((origen) => origen.trim())
+    .filter(Boolean),
   isProduction: process.env.NODE_ENV === 'production',
   db: {
     host: process.env.DB_HOST,
