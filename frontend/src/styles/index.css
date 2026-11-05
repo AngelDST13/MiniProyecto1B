@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Tokens de diseño · "Bancada"
+   Inspiración: la mesa de trabajo del taller. Papel de orden de servicio,
+   tinta grafito y una señal naranja de "atención técnica".
+   ===================================================================== */
+@theme {
+  --color-paper: #f3f0e8;
+  --color-paper-deep: #e9e4d8;
+  --color-panel: #ffffff;
+  --color-ink: #15171c;
+  --color-ink-soft: #2a2d35;
+  --color-muted: #676b75;
+  --color-line: #ddd7ca;
+  --color-line-strong: #c9c1b0;
+
+  --color-signal: #ff5a1f;        /* acento: botones, foco, marca */
+  --color-signal-deep: #c2410c;   /* acento para texto sobre claro (mejor contraste) */
+  --color-signal-soft: #ffe7dc;
+
+  /* Estados del flujo de reparación */
+  --color-st-recibido: #3d6be0;
+  --color-st-recibido-soft: #e3ebfc;
+  --color-st-diagnostico: #c98a06;
+  --color-st-diagnostico-soft: #fbf0d3;
+  --color-st-reparado: #13865c;
+  --color-st-reparado-soft: #dcf2e8;
+  --color-st-entregado: #5f636d;
+  --color-st-entregado-soft: #e8e8ea;
+
+  --color-danger: #d1352b;
+  --color-danger-soft: #fce4e2;
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --shadow-ticket: 0 1px 0 rgb(21 23 28 / 0.04), 0 8px 24px -12px rgb(21 23 28 / 0.18);
+  --shadow-lift: 0 2px 0 rgb(21 23 28 / 0.05), 0 18px 40px -18px rgb(21 23 28 / 0.35);
+
+  --animate-rise: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade: fade 0.2s ease-out both;
+  --animate-sheet: sheet 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes sheet {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    /* Tapete de trabajo: retícula de puntos muy sutil */
+    background-image: radial-gradient(rgb(21 23 28 / 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-signal-soft);
+  }
+}
+
+@layer components {
+  /* Borde perforado tipo talonario, usado en los tickets de órdenes */
+  .perforado {
+    background-image: linear-gradient(to right, var(--color-line-strong) 50%, transparent 0);
+    background-size: 8px 1px;
+    background-repeat: repeat-x;
+    height: 1px;
+  }
+
+  .scrollbar-fino {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,13 @@
+# Dependencias y builds
+node_modules/
+frontend/dist/
+
+# Variables de entorno (contienen contraseñas y la clave JWT)
+.env
+frontend/.env
+
+# Configuración local de editores / herramientas
+.claude/
+.qodo/
+.vscode/
+*.log
