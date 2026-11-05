@@ -2,6 +2,7 @@
 import app from './app.js';
 import { env } from './config/env.js';
 import { testConnection } from './config/db.js';
+import { iniciarTareasProgramadas } from './jobs/informeDiario.js';
 
 try {
   await testConnection();
@@ -15,6 +16,7 @@ try {
 const servidor = app.listen(env.port, () => {
   console.log(`API del Taller de Servicio Técnico escuchando en http://localhost:${env.port}`);
   console.log(`Frontend permitido (CORS): ${env.corsOrigins.join(', ')}`);
+  iniciarTareasProgramadas();
 });
 
 // Mensaje claro si el puerto ya está ocupado (por ejemplo, el backend ya está abierto en otra terminal).

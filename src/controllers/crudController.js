@@ -66,6 +66,7 @@ export const crearControladorCrud = (entidad) => {
     create: async (req, res) => {
       const { datos, errores } = validarEntidad(entidad, req.body, { esCreacion: true });
       assertValido(errores, `Datos de ${singular.toLowerCase()} inválidos`);
+      entidad.preparar?.(datos); // por ejemplo, generar el slug a partir del nombre
       await verificarIntegridad(datos);
 
       const registro = await modelo.create(await cifrarContrasenas(datos));
@@ -78,6 +79,7 @@ export const crearControladorCrud = (entidad) => {
 
       const { datos, errores } = validarEntidad(entidad, req.body, { esCreacion: false });
       assertValido(errores, `Datos de ${singular.toLowerCase()} inválidos`);
+      entidad.preparar?.(datos);
       await verificarIntegridad(datos, id);
 
       const registro = await modelo.update(id, await cifrarContrasenas(datos));

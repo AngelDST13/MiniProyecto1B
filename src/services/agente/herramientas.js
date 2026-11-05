@@ -4,6 +4,7 @@
 import { pool } from '../../config/db.js';
 import { ESTADOS } from '../../validators/ordenValidator.js';
 import { CATEGORIAS } from '../../validators/componenteValidator.js';
+import { obtenerDetalleOrden } from '../informes/detalleOrden.js';
 
 const STOCK_BAJO = 3;
 const REGEX_FECHA = /^\d{4}-\d{2}-\d{2}$/;
@@ -149,36 +150,12 @@ const IMPLEMENTACIONES = {
   async detalle_orden(entrada) {
     const id = entero(entrada.orden_id, { max: 1e9 });
     if (!id) throw new Error('orden_id debe ser un entero positivo');
-    const [orden] = await consultar(
-      `SELECT o.id, CONCAT('OS-', LPAD(o.id, 4, '0')) AS codigo, o.tipo_equipo, o.marca_modelo, o.serial,
-              o.diagnostico, o.estado, o.fecha_ingreso, c.nombre AS cliente, c.cedula, c.telefono, c.email
-       FROM ordenes_servicio o JOIN clientes c ON c.id = o.cliente_id WHERE o.id = ?`,
-      [id],
-    );
-    if (!orden) return { error: `No existe la orden OS-${String(id).padStart(4, '0')}` };
+    const detalle = await obtenerDetalleOrden(id);
+    if (!detalle) return { error: `No existe la orden OS-${String(id).padStart(4, '0')}` };
 
-    const [repuestos, pagos, cotizaciones, garantias, seguimientos] = await Promise.all([
-      consultar(
-        `SELECT cr.nombre, cr.categoria, oc.cantidad, oc.precio_unitario, oc.cantidad * oc.precio_unitario AS subtotal
-         FROM orden_componentes oc JOIN componentes_repuesto cr ON cr.id = oc.componente_id WHERE oc.orden_id = ?`,
-        [id],
-      ),
-      consultar(
-        `SELECT p.monto, p.fecha_pago, p.referencia, mp.nombre AS metodo
-         FROM pagos p JOIN metodos_pago mp ON mp.id = p.metodo_pago_id WHERE p.orden_id = ? ORDER BY p.fecha_pago`,
-        [id],
-      ),
-      consultar('SELECT descripcion, monto, valida_hasta, estado FROM cotizaciones WHERE orden_id = ?', [id]),
-      consultar('SELECT fecha_inicio, fecha_fin, cobertura, estado FROM garantias WHERE orden_id = ?', [id]),
-      consultar(
-        `SELECT s.fecha, t.nombres AS tecnico, s.nota
-         FROM seguimientos s JOIN tecnicos t ON t.id = s.tecnico_id WHERE s.orden_id = ? ORDER BY s.fecha`,
-        [id],
-      ),
-    ]);
-    const totalRepuestos = repuestos.reduce((suma, r) => suma + Number(r.subtotal), 0);
-    const totalPagado = pagos.reduce((suma, p) => suma + Number(p.monto), 0);
-    return { orden, repuestos, total_repuestos: totalRepuestos, pagos, total_pagado: totalPagado, cotizaciones, garantias, seguimientos };
+    const totalRepuestos = detalle.repuestos.reduce((suma, r) => suma + Number(r.subtotal), 0);
+    const totalPagado = detalle.pagos.reduce((suma, p) => suma + Number(p.monto), 0);
+    return { ...detalle, total_repuestos: totalRepuestos, total_pagado: totalPagado };
   },
 
   async buscar_clientes(entrada) {

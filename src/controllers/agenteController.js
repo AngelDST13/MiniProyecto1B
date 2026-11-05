@@ -69,6 +69,14 @@ export const postChat = async (req, res) => {
     if (error instanceof Anthropic.RateLimitError) {
       throw new AppError('El servicio de IA está ocupado. Intenta de nuevo en un momento.', 429, 'AGENTE_OCUPADO');
     }
+    // La cuenta de Anthropic no tiene créditos (la API lo informa como 400 con este detalle).
+    if (error instanceof Anthropic.BadRequestError && /credit balance/i.test(error.message)) {
+      throw new AppError(
+        'La cuenta de Anthropic no tiene saldo. Recarga créditos en platform.claude.com → Plans & Billing.',
+        503,
+        'AGENTE_SIN_SALDO',
+      );
+    }
     if (error instanceof Anthropic.APIConnectionError) {
       throw new AppError('No se pudo conectar con el servicio de IA. Revisa la conexión a internet.', 502, 'AGENTE_SIN_CONEXION');
     }

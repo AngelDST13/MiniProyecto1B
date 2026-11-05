@@ -37,6 +37,20 @@ export const env = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN ?? '8h',
   },
+  // URL pública del frontend: se usa en los enlaces de los correos (confirmar correo, restablecer contraseña…)
+  appUrl: (process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, ''),
+  zonaHoraria: process.env.ZONA_HORARIA || 'America/Guayaquil',
+  // Correo (Gmail con contraseña de aplicación). Sin SMTP_USER/SMTP_PASS los correos se
+  // "simulan": se guardan en el registro de correos para verlos en el panel, sin enviarse.
+  correo: {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT ?? 465),
+    usuario: process.env.SMTP_USER ?? '',
+    clave: (process.env.SMTP_PASS ?? '').replaceAll(' ', ''), // Google muestra la clave con espacios
+    remitente: process.env.MAIL_FROM || (process.env.SMTP_USER ? `Bancada <${process.env.SMTP_USER}>` : 'Bancada <no-responder@bancada.local>'),
+  },
+  // Inicio de sesión con Google (opcional)
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
   // Agente de IA (opcional): sin ANTHROPIC_API_KEY el resto del sistema funciona igual.
   agente: {
     apiKey: process.env.ANTHROPIC_API_KEY ?? '',

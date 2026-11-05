@@ -11,10 +11,12 @@ const describirCampo = ({ nombre, etiqueta, tipo, requerido, unico, min, max, op
   ayuda, porDefecto, moneda: Boolean(moneda), ancho: ancho ?? 'medio', mono: Boolean(mono),
 });
 
-/** GET /api/admin/entidades — los 20 módulos con su conteo de registros */
+/** GET /api/admin/entidades — los módulos que el rol puede usar, con su conteo de registros */
 export const getEntidades = async (req, res) => {
+  // Cada rol ve solo los módulos que puede usar (el técnico no ve Usuarios, Pedidos ni Solicitudes).
+  const esAdmin = req.usuario?.rol === 'admin';
   const genericas = await Promise.all(
-    ENTIDADES.map(async (entidad) => ({
+    ENTIDADES.filter((entidad) => (entidad.roles ?? ['admin', 'tecnico']).includes(req.usuario?.rol)).map(async (entidad) => ({
       clave: entidad.clave,
       singular: entidad.singular,
       plural: entidad.plural,
@@ -28,7 +30,7 @@ export const getEntidades = async (req, res) => {
   );
 
   const personalizadas = await Promise.all(
-    MODULOS_PERSONALIZADOS.map(async ({ tabla, ...modulo }) => ({
+    MODULOS_PERSONALIZADOS.filter((modulo) => esAdmin || !modulo.soloAdmin).map(async ({ tabla, soloAdmin: _soloAdmin, ...modulo }) => ({
       ...modulo,
       personalizado: true,
       total: await contarRegistros(tabla),

@@ -19,6 +19,8 @@ import seguimientos from './seguimientos.js';
 import garantias from './garantias.js';
 import pagos from './pagos.js';
 import gastos from './gastos.js';
+import productos from './productos.js';
+import categoriasProducto from './categoriasProducto.js';
 
 export const ENTIDADES = [
   citas, cotizaciones, seguimientos, garantias,
@@ -26,11 +28,12 @@ export const ENTIDADES = [
   tecnicos, especialidades, sucursales,
   pagos, metodosPago, gastos, categoriasGasto,
   servicios, marcas,
+  productos, categoriasProducto,
   usuarios,
 ];
 
-// Módulos con página propia (CRUD a medida del Día 1 y 2). Se listan en el panel de
-// Administración junto con los genéricos: 3 + 17 = 20 CRUDs.
+// Módulos con página propia (lógica a medida). Se listan en el panel de Administración
+// junto con los genéricos: 5 propios + 19 genéricos = 24 módulos.
 export const MODULOS_PERSONALIZADOS = [
   {
     clave: 'ordenes', tabla: 'ordenes_servicio', plural: 'Órdenes de servicio', singular: 'Orden de servicio',
@@ -46,6 +49,16 @@ export const MODULOS_PERSONALIZADOS = [
     clave: 'componentes', tabla: 'componentes_repuesto', plural: 'Repuestos', singular: 'Repuesto',
     descripcion: 'Inventario de componentes con stock.', grupo: 'Compras e inventario',
     icono: 'Cpu', rutaFrontend: '/repuestos',
+  },
+  {
+    clave: 'pedidos', tabla: 'pedidos', plural: 'Pedidos de la tienda', singular: 'Pedido',
+    descripcion: 'Compras en línea y su estado de entrega.', grupo: 'Tienda',
+    icono: 'ShoppingCart', rutaFrontend: '/gestion/pedidos', soloAdmin: true,
+  },
+  {
+    clave: 'solicitudes', tabla: 'solicitudes_informe', plural: 'Solicitudes de informe', singular: 'Solicitud',
+    descripcion: 'Informes que piden los clientes y el admin aprueba.', grupo: 'Atención y servicio',
+    icono: 'FileCheck', rutaFrontend: '/gestion/solicitudes', soloAdmin: true,
   },
 ];
 

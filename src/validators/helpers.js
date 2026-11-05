@@ -18,6 +18,24 @@ export const estaVacio = (valor) => valor === undefined || valor === null || val
 
 export const tieneErrores = (errores) => Object.keys(errores).length > 0;
 
+/**
+ * Valida una cédula ecuatoriana: 10 dígitos, provincia 01-24 (o 30 para extranjeros),
+ * tercer dígito menor a 6 y dígito verificador con el algoritmo módulo 10 del Registro Civil.
+ */
+export const cedulaEcuatorianaValida = (cedula) => {
+  if (!/^\d{10}$/.test(cedula)) return false;
+  const provincia = Number(cedula.slice(0, 2));
+  if (!((provincia >= 1 && provincia <= 24) || provincia === 30)) return false;
+  if (Number(cedula[2]) >= 6) return false;
+  const suma = [...cedula.slice(0, 9)].reduce((total, digito, i) => {
+    let valor = Number(digito) * (i % 2 === 0 ? 2 : 1);
+    if (valor > 9) valor -= 9;
+    return total + valor;
+  }, 0);
+  const verificador = (10 - (suma % 10)) % 10;
+  return verificador === Number(cedula[9]);
+};
+
 // Valida un texto obligatorio con longitud mínima y máxima.
 export const validarTextoObligatorio = (errores, campo, valor, { min = 1, max }) => {
   if (!valor) {
