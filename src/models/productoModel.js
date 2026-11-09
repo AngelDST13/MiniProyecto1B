@@ -4,6 +4,7 @@ import { pool } from '../config/db.js';
 const SELECT_PRODUCTO = `
   SELECT p.id, p.nombre, p.slug, p.sku, p.descripcion, p.especificaciones, p.precio, p.precio_anterior, p.stock,
          p.imagen_url, p.garantia_meses, p.destacado, p.created_at,
+         p.pc_tipo, p.pc_socket, p.pc_memoria, p.pc_formato, p.pc_consumo_w,
          c.id AS categoria_id, c.nombre AS categoria, c.slug AS categoria_slug, c.icono AS categoria_icono,
          m.id AS marca_id, m.nombre AS marca
   FROM productos p
@@ -72,6 +73,12 @@ export const ProductoModel = {
       valores,
     );
     return { total, pagina, paginas: Math.max(1, Math.ceil(total / porPagina)), data: filas.map(mapear) };
+  },
+
+  /** Componentes para el armador de PC (solo activos y con tipo de pieza definido) */
+  async componentesPc() {
+    const [filas] = await pool.query(`${SELECT_PRODUCTO} WHERE p.activo = 1 AND p.pc_tipo IS NOT NULL ORDER BY p.pc_tipo, p.precio`);
+    return filas.map(mapear);
   },
 
   async porSlug(slug) {

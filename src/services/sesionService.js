@@ -2,7 +2,7 @@
 import { pool } from '../config/db.js';
 import { env } from '../config/env.js';
 import { UsuarioModel } from '../models/usuarioModel.js';
-import { DURACION_RECORDARME, firmarToken } from '../utils/jwt.js';
+import { duracionSesion, firmarToken } from '../utils/jwt.js';
 import { configuracion } from './configuracionService.js';
 import { enviarCorreo } from './correo/correoService.js';
 import { correoNuevoInicio } from './correo/plantillas.js';
@@ -47,7 +47,8 @@ export const emitirSesion = async (req, usuario, { recordar = false } = {}) => {
 
   return {
     token: firmarToken(usuario, { recordar }),
-    expiresIn: recordar ? DURACION_RECORDARME : env.jwt.expiresIn,
+    expiresIn: duracionSesion(),                 // se renueva mientras haya actividad
+    inactividadMinutos: env.jwt.inactividadMinutos,
     usuario: await UsuarioModel.findById(usuario.id),
   };
 };

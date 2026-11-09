@@ -77,6 +77,9 @@ export const postChat = async (req, res) => {
         'AGENTE_SIN_SALDO',
       );
     }
+    if (error instanceof Anthropic.APIConnectionTimeoutError) {
+      throw new AppError('El servicio de IA tardó demasiado en responder. Intenta de nuevo.', 504, 'AGENTE_TIEMPO_AGOTADO');
+    }
     if (error instanceof Anthropic.APIConnectionError) {
       throw new AppError('No se pudo conectar con el servicio de IA. Revisa la conexión a internet.', 502, 'AGENTE_SIN_CONEXION');
     }

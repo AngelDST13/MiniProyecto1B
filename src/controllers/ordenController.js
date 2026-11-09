@@ -1,5 +1,6 @@
 // Controlador de OrdenServicio y de los repuestos usados en cada orden.
 import { OrdenModel } from '../models/ordenModel.js';
+import { facturarAutomaticamente } from '../services/facturaService.js';
 import { ClienteModel } from '../models/clienteModel.js';
 import { contarDependientes, describirDependencias } from '../models/crudModel.js';
 import {
@@ -66,6 +67,7 @@ export const updateOrden = async (req, res) => {
   await verificarCliente(datos.cliente_id);
 
   const orden = await OrdenModel.update(id, datos);
+  if (datos.estado === 'Entregado') facturarAutomaticamente('orden', id);
   res.status(200).json({ message: 'Orden actualizada correctamente', data: orden });
 };
 
@@ -78,6 +80,7 @@ export const updateEstadoOrden = async (req, res) => {
   assertValido(errores, 'Estado inválido');
 
   const orden = await OrdenModel.updateEstado(id, datos.estado);
+  if (datos.estado === 'Entregado') facturarAutomaticamente('orden', id);
   res.status(200).json({ message: `Orden movida a "${datos.estado}"`, data: orden });
 };
 

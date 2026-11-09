@@ -5,7 +5,7 @@ import { formatMoney } from '../../utils/format.js';
 
 const ALTO = 260;
 const MARGEN = { arriba: 12, derecha: 12, abajo: 28, izquierda: 56 };
-const fechaCorta = new Intl.DateTimeFormat('es-EC', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+const fechaCorta = new Intl.DateTimeFormat('es-CR', { day: '2-digit', month: 'short', timeZone: 'UTC' });
 const etiquetaDia = (dia) => fechaCorta.format(new Date(`${dia}T12:00:00Z`));
 
 // Escala "bonita" para el eje Y: 0 y 4 divisiones redondas

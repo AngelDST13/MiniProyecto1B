@@ -1,15 +1,26 @@
-// Validación de cédula ecuatoriana en el navegador (para avisar al instante).
+// Identificación de Costa Rica en el navegador (para avisar al instante).
 // El backend la valida de nuevo: esta es solo una ayuda para el usuario.
-export const cedulaValida = (cedula) => {
-  if (!/^\d{10}$/.test(cedula)) return false;
-  const provincia = Number(cedula.slice(0, 2));
-  if (!((provincia >= 1 && provincia <= 24) || provincia === 30) || Number(cedula[2]) >= 6) return false;
-  const suma = [...cedula.slice(0, 9)].reduce((total, digito, i) => {
-    let valor = Number(digito) * (i % 2 === 0 ? 2 : 1);
-    if (valor > 9) valor -= 9;
-    return total + valor;
-  }, 0);
-  return (10 - (suma % 10)) % 10 === Number(cedula[9]);
+//  - Cédula física: 9 dígitos (1-0234-0567)
+//  - Cédula jurídica: 10 dígitos que empiezan en 2-5 (3-101-845210)
+//  - DIMEX: 11 o 12 dígitos que empiezan en 1
+export const normalizarCedula = (valor) => String(valor ?? '').replace(/[\s-]/g, '');
+
+export const tipoCedula = (valor) => {
+  const cedula = normalizarCedula(valor);
+  if (/^[1-9]\d{8}$/.test(cedula)) return 'Cédula física';
+  if (/^[2-5]\d{9}$/.test(cedula)) return 'Cédula jurídica';
+  if (/^1\d{10,11}$/.test(cedula)) return 'DIMEX';
+  return null;
+};
+
+export const cedulaValida = (valor) => tipoCedula(valor) !== null;
+
+// Formato legible: 102340567 → 1-0234-0567 · 3101845210 → 3-101-845210
+export const formatearCedula = (valor) => {
+  const c = normalizarCedula(valor);
+  if (/^\d{9}$/.test(c)) return `${c[0]}-${c.slice(1, 5)}-${c.slice(5)}`;
+  if (/^\d{10}$/.test(c)) return `${c[0]}-${c.slice(1, 4)}-${c.slice(4)}`;
+  return c;
 };
 
 // Nivel de una contraseña de 0 a 4 con su descripción.

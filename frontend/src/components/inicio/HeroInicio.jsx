@@ -84,7 +84,7 @@ export const HeroInicio = () => {
             icono={Wallet}
             color="bg-st-reparado-soft text-st-reparado"
             titulo="Pago recibido"
-            detalle="$70,00 · Transferencia"
+            detalle="₡35 900 · SINPE Móvil"
             className="right-0 -bottom-8 -rotate-2 lg:-right-4"
           />
         </div>

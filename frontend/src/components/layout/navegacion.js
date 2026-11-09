@@ -1,7 +1,7 @@
 // Secciones del panel interno por rol. La barra lateral las agrupa; la barra inferior del celular
 // muestra solo las marcadas como "movil" (máximo 5).
 import {
-  ClipboardList, Cpu, FileCheck, Gauge, LayoutDashboard, Settings2, ShoppingCart, Store, Users, Zap,
+  ClipboardList, Cpu, FileCheck, Gauge, LayoutDashboard, Receipt, Settings2, ShoppingCart, Store, Users, Zap,
 } from 'lucide-react';
 
 const TODOS = ['admin', 'tecnico'];
@@ -22,6 +22,7 @@ export const GRUPOS_NAVEGACION = [
     titulo: 'Tienda y clientes',
     items: [
       { to: '/gestion/pedidos', etiqueta: 'Pedidos', icono: ShoppingCart, roles: ['admin'], movil: true },
+      { to: '/gestion/facturas', etiqueta: 'Facturas', icono: Receipt, roles: ['admin'] },
       { to: '/gestion/solicitudes', etiqueta: 'Informes', etiquetaLarga: 'Solicitudes de informe', icono: FileCheck, roles: ['admin'] },
       { to: '/gestion/automatizacion', etiqueta: 'Automatización', icono: Zap, roles: ['admin'] },
       { to: '/tienda', etiqueta: 'Tienda', etiquetaLarga: 'Ver la tienda', icono: Store, roles: TODOS },

@@ -22,7 +22,7 @@ export default {
     { nombre: 'descripcion', etiqueta: 'Descripción', tipo: 'texto', max: 255, enLista: true, ancho: 'completo' },
     {
       nombre: 'icono', etiqueta: 'Icono', tipo: 'opcion', porDefecto: 'Package',
-      opciones: ['Laptop', 'Monitor', 'Cpu', 'HardDrive', 'MonitorSmartphone', 'Keyboard', 'Headphones', 'Wifi', 'Package'],
+      opciones: ['Laptop', 'Monitor', 'Cpu', 'HardDrive', 'MonitorSmartphone', 'Keyboard', 'Headphones', 'Wifi', 'CircuitBoard', 'MemoryStick', 'Gpu', 'PlugZap', 'Box', 'Fan', 'Package'],
     },
     { nombre: 'orden', etiqueta: 'Orden en el menú', tipo: 'entero', requerido: true, min: 0, max: 999, porDefecto: 0, enLista: true },
   ],

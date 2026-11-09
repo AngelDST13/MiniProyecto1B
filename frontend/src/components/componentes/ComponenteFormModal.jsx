@@ -47,7 +47,7 @@ export const ComponenteFormModal = ({ componente, onClose, onGuardado }) => {
         />
 
         <div className="grid grid-cols-2 gap-4">
-          <TextInput id="precio_unitario" name="precio_unitario" label="Precio unitario (USD)" type="number"
+          <TextInput id="precio_unitario" name="precio_unitario" label="Precio unitario (₡)" type="number"
             min="0" step="0.01" inputMode="decimal" placeholder="0.00"
             value={valores.precio_unitario} onChange={cambiar} error={errores.precio_unitario} required />
           <TextInput id="stock" name="stock" label="Stock (unidades)" type="number" min="0" step="1"

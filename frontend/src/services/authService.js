@@ -18,6 +18,7 @@ export const authService = {
   restablecerContrasena: (token, password) => publico('/auth/restablecer-contrasena', { token, password }),
 
   me: () => request('/auth/me'),
+  renovar: () => request('/auth/renovar', { method: 'POST' }),
   actualizarPerfil: (datos) => request('/auth/perfil', { method: 'PUT', body: datos }),
   cambiarPassword: (actual, nueva) => request('/auth/password', { method: 'PUT', body: { actual, nueva } }),
   configurarDosPasos: (activo) => request('/auth/dos-pasos', { method: 'PUT', body: { activo } }),

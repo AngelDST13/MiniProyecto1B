@@ -9,7 +9,7 @@ import { TokenModel } from '../models/tokenModel.js';
 import { validarLogin, validarNuevaPassword, validarPerfil, validarRegistro } from '../validators/usuarioValidator.js';
 import { AppError } from '../utils/AppError.js';
 import { assertValido } from '../utils/assertValido.js';
-import { firmarDesafio2fa, verificarToken } from '../utils/jwt.js';
+import { duracionSesion, firmarDesafio2fa, firmarToken, verificarToken } from '../utils/jwt.js';
 import { crearLimitador } from '../utils/limitador.js';
 import { emitirSesion, registrarInicio } from '../services/sesionService.js';
 import { enviarCorreo } from '../services/correo/correoService.js';
@@ -224,6 +224,16 @@ export const loginGoogle = async (req, res) => {
     return res.status(200).json({ requiere2fa: true, desafio: firmarDesafio2fa(usuario.id, false), correoSimulado: envio === 'Simulado' });
   }
   res.status(200).json(await emitirSesion(req, usuario));
+};
+
+/** POST /api/auth/renovar — nuevo token de 15 min mientras el usuario está activo */
+export const renovarSesion = async (req, res) => {
+  const usuario = await UsuarioModel.findById(req.usuarioId);
+  if (!usuario) return res.status(401).json({ error: 'No autorizado' });
+  res.status(200).json({
+    token: firmarToken(usuario, { recordar: req.sesion.recordar, inicio: req.sesion.inicio }),
+    expiresIn: duracionSesion(),
+  });
 };
 
 /** GET /api/auth/me */

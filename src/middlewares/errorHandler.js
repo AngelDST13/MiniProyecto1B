@@ -4,11 +4,35 @@
 import { AppError } from '../utils/AppError.js';
 import { env } from '../config/env.js';
 
-const responder = (res, status, code, message, details) =>
-  res.status(status).json({ error: { code, message, details } });
+// Errores de mysql2 cuando la base de datos no está disponible
+const BASE_NO_DISPONIBLE = new Set([
+  'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'PROTOCOL_CONNECTION_LOST', 'ER_CON_COUNT_ERROR', 'ER_LOCK_WAIT_TIMEOUT',
+]);
+const ESPERA_SEGUNDOS = { 429: '60', 503: '30' };
 
-// eslint-disable-next-line no-unused-vars
+const responder = (res, status, code, message, details) => {
+  if (ESPERA_SEGUNDOS[status]) res.set('Retry-After', ESPERA_SEGUNDOS[status]);
+  return res.status(status).json({ error: { code, message, details } });
+};
+
 export const errorHandler = (err, req, res, next) => {
+  // La respuesta ya salió (por ejemplo, el 504 del límite de tiempo): el controlador llegó tarde.
+  if (res.headersSent) {
+    return err.code === 'ERR_HTTP_HEADERS_SENT' ? undefined : next(err);
+  }
+
+  // URL con una secuencia % inválida (por ejemplo /api/clientes/%E0)
+  if (err instanceof URIError) {
+    return responder(res, 400, 'INVALID_URL', 'La dirección de la petición no es válida');
+  }
+  // Body mayor al límite o con codificación que express.json no entiende
+  if (err.type === 'entity.too.large') {
+    return responder(res, 413, 'PAYLOAD_TOO_LARGE', 'El contenido enviado supera el máximo permitido (100 KB)');
+  }
+  if (err.type === 'encoding.unsupported' || err.type === 'charset.unsupported') {
+    return responder(res, 415, 'UNSUPPORTED_MEDIA_TYPE', 'La codificación del contenido no es compatible');
+  }
+
   // JSON mal formado en el body (lo lanza express.json)
   if (err.type === 'entity.parse.failed') {
     return responder(res, 400, 'INVALID_JSON', 'El cuerpo de la petición no es un JSON válido');
@@ -27,6 +51,11 @@ export const errorHandler = (err, req, res, next) => {
   }
   if (err.code === 'ER_NO_REFERENCED_ROW_2') {
     return responder(res, 400, 'INVALID_REFERENCE', 'El registro relacionado no existe');
+  }
+
+  if (BASE_NO_DISPONIBLE.has(err.code)) {
+    console.error('[BASE DE DATOS]', err.code, err.message);
+    return responder(res, 503, 'DB_UNAVAILABLE', 'El servicio no está disponible en este momento. Intenta de nuevo en unos segundos.');
   }
 
   // Error inesperado: se registra en consola, pero no se exponen detalles internos.

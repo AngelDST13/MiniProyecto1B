@@ -28,6 +28,16 @@ export default {
     { nombre: 'imagen_url', etiqueta: 'URL de la imagen', tipo: 'url', max: 500, ancho: 'completo', ayuda: 'Opcional. Sin imagen se muestra una ilustración de la categoría.' },
     { nombre: 'descripcion', etiqueta: 'Descripción', tipo: 'textoLargo', max: 2000 },
     { nombre: 'especificaciones', etiqueta: 'Especificaciones', tipo: 'textoLargo', max: 4000, ayuda: 'Una por línea, con el formato "Clave: valor".' },
+    // Armador de PC: solo para componentes (déjalos vacíos en laptops, periféricos, etc.)
+    {
+      nombre: 'pc_tipo', etiqueta: 'Pieza del armador de PC', tipo: 'opcion',
+      opciones: ['cpu', 'motherboard', 'ram', 'gpu', 'almacenamiento', 'fuente', 'gabinete', 'enfriamiento'],
+      ayuda: 'Si lo eliges, el producto aparece en "Arma tu PC".',
+    },
+    { nombre: 'pc_socket', etiqueta: 'Socket (CPU, tarjeta madre o disipador)', tipo: 'texto', max: 60, ayuda: 'Ej.: AM5 o LGA1700. En disipadores, varios separados por coma.' },
+    { nombre: 'pc_memoria', etiqueta: 'Tipo de memoria', tipo: 'opcion', opciones: ['DDR4', 'DDR5'] },
+    { nombre: 'pc_formato', etiqueta: 'Formato (tarjeta madre o gabinete)', tipo: 'opcion', opciones: ['ATX', 'mATX', 'ITX'], ayuda: 'En gabinetes: el formato más grande que admite.' },
+    { nombre: 'pc_consumo_w', etiqueta: 'Consumo / capacidad (W)', tipo: 'entero', min: 0, max: 3000, ayuda: 'CPU y GPU: consumo. Fuente: capacidad.' },
     { nombre: 'destacado', etiqueta: 'Destacado en la portada', tipo: 'booleano', porDefecto: false, enLista: true },
     { nombre: 'activo', etiqueta: 'Visible en la tienda', tipo: 'booleano', porDefecto: true, enLista: true },
   ],
@@ -36,6 +46,7 @@ export default {
     if (!datos.slug) datos.slug = slugify(datos.nombre);
   },
   validar: (datos, errores) => {
+    if (datos.pc_tipo === 'fuente' && !datos.pc_consumo_w) errores.pc_consumo_w = 'Indica la capacidad de la fuente en watts';
     if (datos.precio_anterior !== null && datos.precio_anterior !== undefined && datos.precio_anterior <= datos.precio) {
       errores.precio_anterior = 'El precio anterior debe ser mayor al precio actual (o déjalo vacío)';
     }

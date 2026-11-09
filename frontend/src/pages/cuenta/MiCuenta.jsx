@@ -1,6 +1,6 @@
 // Portal del cliente: resumen, pedidos de la tienda, equipos en reparación y seguridad de la cuenta.
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Laptop, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, Laptop, Receipt, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { iniciales } from '../../utils/format.js';
 
@@ -8,6 +8,7 @@ const PESTANAS = [
   { to: '/mi-cuenta', texto: 'Resumen', icono: LayoutDashboard, end: true },
   { to: '/mi-cuenta/pedidos', texto: 'Mis pedidos', icono: ShoppingBag },
   { to: '/mi-cuenta/equipos', texto: 'Mis equipos', icono: Laptop },
+  { to: '/mi-cuenta/facturas', texto: 'Facturas', icono: Receipt },
   { to: '/mi-cuenta/seguridad', texto: 'Cuenta y seguridad', icono: ShieldCheck },
 ];
 

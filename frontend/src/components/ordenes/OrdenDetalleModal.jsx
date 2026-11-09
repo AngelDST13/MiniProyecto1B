@@ -1,6 +1,7 @@
 // Detalle completo de una orden: estado, datos del cliente y del equipo, repuestos usados.
 import { useCallback, useState } from 'react';
-import { Pencil, Phone, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { FileText, Pencil, Phone, Trash2 } from 'lucide-react';
 import { ordenService } from '../../services/ordenService.js';
 import { componenteService } from '../../services/componenteService.js';
 import { useToast } from '../../hooks/useToast.js';
@@ -71,7 +72,13 @@ export const OrdenDetalleModal = ({ ordenId, onClose, onActualizada, onEditar, o
             <Button variante="fantasma" icono={Trash2} className="text-danger hover:bg-danger-soft!" onClick={() => onEliminar(orden)}>
               Eliminar orden
             </Button>
-            <Button variante="borde" icono={Pencil} onClick={() => onEditar(orden)}>Editar datos</Button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Link to={`/documentos/orden/${orden.id}`} target="_blank"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-line-strong bg-panel px-4 text-sm font-semibold transition hover:border-ink">
+                <FileText className="size-4" aria-hidden /> Informe técnico
+              </Link>
+              <Button variante="borde" icono={Pencil} onClick={() => onEditar(orden)}>Editar datos</Button>
+            </div>
           </div>
         )
       }

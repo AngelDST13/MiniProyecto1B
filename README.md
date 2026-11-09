@@ -422,4 +422,5 @@ El request *"Login OK"* guarda el token automáticamente, los de creación guard
 | [docs/02-modelo-de-datos.md](docs/02-modelo-de-datos.md) | Diagrama entidad-relación completo y reglas de integridad |
 | [docs/03-informe-jwt.md](docs/03-informe-jwt.md) | Informe de investigación sobre la aplicación del token JWT, con fuentes |
 | [docs/04-checklist-entregables.md](docs/04-checklist-entregables.md) | Verificación de cada requisito de las consignas del Día 1 y 2 |
+| [docs/05-codigos-http.md](docs/05-codigos-http.md) | Códigos de estado HTTP 2xx, 3xx, 4xx y 5xx de la API y cómo probarlos |
 | [src/docs/](src/docs/) | Consignas originales del Mini Proyecto 1 |

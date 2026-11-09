@@ -8,6 +8,7 @@ import authRoutes from './authRoutes.js';
 import tiendaRoutes from './tiendaRoutes.js';
 import portalRoutes from './portalRoutes.js';
 import gestionRoutes from './gestionRoutes.js';
+import documentoRoutes from './documentoRoutes.js';
 import clienteRoutes from './clienteRoutes.js';
 import ordenRoutes from './ordenRoutes.js';
 import componenteRoutes from './componenteRoutes.js';
@@ -26,6 +27,7 @@ router.use('/tienda', tiendaRoutes);
 
 // Cualquier usuario con sesión (lo usan sobre todo los clientes)
 router.use('/portal', authMiddleware, requireRol('admin', 'tecnico', 'cliente'), portalRoutes);
+router.use('/documentos', authMiddleware, requireRol('admin', 'tecnico', 'cliente'), documentoRoutes);
 
 // Personal del taller
 router.use('/clientes', authMiddleware, soloPersonal, clienteRoutes);

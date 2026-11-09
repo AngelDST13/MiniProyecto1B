@@ -36,9 +36,9 @@ export const ClienteFormModal = ({ cliente, onClose, onGuardado }) => {
             <TextInput id="nombre" name="nombre" label="Nombre completo" placeholder="María Fernanda López"
               value={valores.nombre} onChange={cambiar} error={errores.nombre} autoComplete="off" required />
           </div>
-          <TextInput id="cedula" name="cedula" label="Cédula" placeholder="0102030405" inputMode="numeric"
+          <TextInput id="cedula" name="cedula" label="Cédula" placeholder="1-0234-0567" inputMode="numeric"
             value={valores.cedula} onChange={cambiar} error={errores.cedula} required />
-          <TextInput id="telefono" name="telefono" label="Teléfono" placeholder="0991234567" type="tel"
+          <TextInput id="telefono" name="telefono" label="Teléfono" placeholder="8888-8888" type="tel"
             value={valores.telefono} onChange={cambiar} error={errores.telefono} required />
           <div className="sm:col-span-2">
             <TextInput id="email" name="email" label="Email" placeholder="cliente@correo.com" type="email"

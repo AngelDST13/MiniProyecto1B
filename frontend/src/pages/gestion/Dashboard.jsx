@@ -14,6 +14,7 @@ import { Button } from '../../components/ui/Button.jsx';
 import { GraficoLineas } from '../../components/graficos/GraficoLineas.jsx';
 import { GraficoBarras } from '../../components/graficos/GraficoBarras.jsx';
 import { EstadoPedido } from '../cuenta/SeccionesCuenta.jsx';
+import { AnalisisIA } from '../../components/gestion/AnalisisIA.jsx';
 
 // Colores de las series validados (contraste y daltonismo) con la guía de visualización
 const SERIES = [
@@ -22,7 +23,7 @@ const SERIES = [
   { clave: 'gastos', etiqueta: 'Gastos', color: '#b58a00' },
 ];
 const PERIODOS = [7, 30, 90];
-const porcentaje = new Intl.NumberFormat('es-EC', { style: 'percent', maximumFractionDigits: 0 });
+const porcentaje = new Intl.NumberFormat('es-CR', { style: 'percent', maximumFractionDigits: 0 });
 
 const Variacion = ({ valor, invertir = false }) => {
   if (valor === null || valor === undefined) return <span className="text-xs text-muted">sin período previo</span>;
@@ -152,6 +153,8 @@ export const Dashboard = () => {
             <Alerta a="/gestion/solicitudes" icono={FileCheck} valor={k.solicitudesPendientes.valor} texto="Informes por aprobar" tono="border-st-recibido/40 bg-st-recibido-soft text-st-recibido" />
             <Alerta a="/gestion/automatizacion" icono={Lock} valor={k.loginsFallidos.valor} texto={`Accesos fallidos (${dias} d)`} tono="border-danger/30 bg-danger-soft text-danger" />
           </div>
+
+          <AnalisisIA dias={dias} />
 
           <Tarjeta titulo="Ingresos y gastos por día">
             <GraficoLineas datos={datos.serie} series={SERIES} />

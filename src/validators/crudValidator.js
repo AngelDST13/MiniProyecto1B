@@ -5,7 +5,7 @@ import { aNumero, estaVacio, limpiarTexto } from './helpers.js';
 const REGEX = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   telefono: /^\+?[0-9\s-]{7,15}$/,
-  cedula: /^[0-9]{10}$/,
+  cedula: /^[0-9]{9,12}$/,
   url: /^https?:\/\/[^\s]+\.[^\s]+$/i,
   fecha: /^\d{4}-\d{2}-\d{2}$/,
   fechaHora: /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})(?::(\d{2}))?$/,
@@ -14,7 +14,7 @@ const REGEX = {
 const MENSAJES = {
   email: 'El email no tiene un formato válido',
   telefono: 'El teléfono debe tener entre 7 y 15 dígitos',
-  cedula: 'La cédula debe tener 10 dígitos',
+  cedula: 'Identificación no válida: física (9 dígitos), jurídica (10) o DIMEX (11-12)',
   url: 'La URL debe empezar con http:// o https://',
 };
 
@@ -57,6 +57,7 @@ const procesarCampo = (campo, original) => {
   if (TIPOS_TEXTO.includes(tipo)) {
     let valor = limpiarTexto(original);
     if (tipo === 'email') valor = valor.toLowerCase();
+    if (tipo === 'cedula') valor = valor.replace(/[\s-]/g, ''); // "1-0234-0567" → "102340567"
     return { valor, error: valor ? validarTexto(campo, valor) : null };
   }
 

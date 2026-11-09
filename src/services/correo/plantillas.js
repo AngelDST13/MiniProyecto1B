@@ -11,9 +11,10 @@ export const esc = (valor) =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
-const dinero = (valor) => new Intl.NumberFormat('es-EC', { style: 'currency', currency: 'USD' }).format(Number(valor ?? 0));
+// Montos en colones costarricenses: ₡659 900,00
+export const dinero = (valor) => new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(Number(valor ?? 0));
 const fechaLarga = (fecha) =>
-  new Intl.DateTimeFormat('es-EC', { dateStyle: 'long', timeStyle: 'short', timeZone: env.zonaHoraria }).format(
+  new Intl.DateTimeFormat('es-CR', { dateStyle: 'long', timeStyle: 'short', timeZone: env.zonaHoraria }).format(
     fecha ? new Date(String(fecha).replace(' ', 'T')) : new Date(),
   );
 export const codigoOrden = (id) => `OS-${String(id).padStart(4, '0')}`;
@@ -133,7 +134,7 @@ const filasPedido = (pedido) =>
     )
     .join('');
 
-export const correoPedidoRecibido = ({ nombre, pedido }) => ({
+export const correoPedidoRecibido = ({ nombre, pedido, empresa }) => ({
   asunto: `Recibimos tu pedido ${codigoPedido(pedido.id)} · Bancada`,
   html: plantilla({
     titulo: '¡Gracias por tu compra!',
@@ -147,8 +148,11 @@ export const correoPedidoRecibido = ({ nombre, pedido }) => ({
         ['<strong>Total</strong>', `<strong>${dinero(pedido.total)}</strong>`],
       ]) +
       bloque('Pago y entrega', tabla([['Método de pago', esc(pedido.metodo_pago)], ['Entrega', esc(pedido.tipo_entrega)], ...(pedido.direccion ? [['Dirección', esc(`${pedido.direccion}, ${pedido.ciudad ?? ''}`)]] : [])])) +
+      (pedido.metodo_pago === 'SINPE Móvil'
+        ? bloque('Paga por SINPE Móvil', parrafo(`Envía <strong>${dinero(pedido.total)}</strong> al número <strong>${esc(empresa.sinpe)}</strong> (${esc(empresa.nombre)}) con el detalle <strong>${codigoPedido(pedido.id)}</strong>.`))
+        : '') +
       (pedido.metodo_pago === 'Transferencia'
-        ? bloque('Datos para la transferencia', parrafo(`Banco Pichincha · Cuenta corriente 2100000000 · Bancada S.A. · RUC 1790000000001<br>Usa <strong>${codigoPedido(pedido.id)}</strong> como referencia.`))
+        ? bloque('Datos para la transferencia', parrafo(`${esc(empresa.nombre)} · Cédula jurídica ${esc(empresa.cedulaJuridica)}<br>IBAN <strong>${esc(empresa.iban)}</strong><br>Usa <strong>${codigoPedido(pedido.id)}</strong> como referencia.`))
         : '') +
       `<p style="margin:24px 0 0">${boton('Ver mi pedido', `${env.appUrl}/mi-cuenta/pedidos`)}</p>`,
   }),
@@ -215,7 +219,7 @@ export const correoSolicitudRechazada = ({ nombre, orden, motivo }) => ({
 // ---------------------------------------------------------------------
 // Informe diario para administradores
 // ---------------------------------------------------------------------
-export const correoInformeDiario = ({ fecha, datos }) => {
+export const correoInformeDiario = ({ fecha, datos, analisisIA = null }) => {
   const kpi = (valor, etiqueta) =>
     `<td width="50%" style="padding:6px"><div style="background:${C.papel};border-radius:14px;padding:14px"><div style="font-size:24px;font-weight:800">${valor}</div><div style="font-size:12px;color:${C.suave}">${esc(etiqueta)}</div></div></td>`;
   return {
@@ -225,6 +229,9 @@ export const correoInformeDiario = ({ fecha, datos }) => {
       previo: `${datos.ordenesIngresadas} ingresos · ${dinero(datos.ventasTienda)} en la tienda · ${dinero(datos.pagosTaller)} cobrados en el taller`,
       contenido:
         parrafo('Resumen automático de la actividad de hoy en el taller y la tienda.') +
+        (analisisIA
+          ? bloque('Análisis de la IA', `<div style="background:#fff7f2;border-left:3px solid ${C.senal};border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6">${esc(analisisIA).replaceAll('\n', '<br>')}</div>`)
+          : '') +
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${kpi(datos.ordenesIngresadas, 'equipos ingresados')}${kpi(datos.ordenesEntregadas, 'equipos entregados')}</tr><tr>${kpi(dinero(datos.pagosTaller), 'cobrado en el taller')}${kpi(dinero(datos.ventasTienda), `vendido en la tienda (${datos.pedidosHoy} pedidos)`)}</tr></table>` +
         bloque('Órdenes en curso', tabla(Object.entries(datos.ordenesPorEstado).map(([estado, total]) => [esc(estado), esc(total)]))) +
         bloque('Pendientes de atender', tabla([
@@ -239,3 +246,61 @@ export const correoInformeDiario = ({ fecha, datos }) => {
     }),
   };
 };
+
+// ---------------------------------------------------------------------
+// Facturas y automatizaciones
+// ---------------------------------------------------------------------
+export const correoFactura = ({ factura, empresa }) => ({
+  asunto: `Factura ${factura.consecutivo} · ${empresa.nombre}`,
+  html: plantilla({
+    titulo: `Factura ${factura.consecutivo}`,
+    previo: `Total ${dinero(factura.total)}`,
+    contenido:
+      parrafo(`Hola, ${esc(factura.cliente_nombre)}. Gracias por tu compra. Este es el detalle de tu factura.`) +
+      tabla([
+        ['Emitida', esc(fechaLarga(factura.created_at))],
+        ['Emisor', esc(`${empresa.nombre} · Céd. jurídica ${empresa.cedulaJuridica}`)],
+        ['Método de pago', esc(factura.metodo_pago ?? '—')],
+      ]) +
+      bloque('Detalle', tabla(factura.lineas.map((l) => [esc(`${l.cantidad} × ${l.descripcion}`), dinero(l.cantidad * l.precio_unitario)]))) +
+      tabla([
+        ['Subtotal (sin IVA)', dinero(factura.subtotal)],
+        [`IVA ${esc(empresa.iva)} %`, dinero(factura.iva)],
+        ['<strong>Total</strong>', `<strong>${dinero(factura.total)}</strong>`],
+      ]) +
+      `<p style="margin:24px 0 0">${boton('Ver e imprimir la factura', `${env.appUrl}/documentos/factura/${factura.id}`)}</p>`,
+  }),
+});
+
+export const correoRecordatorioCita = ({ nombre, cita, empresa }) => ({
+  asunto: `Recordatorio: tu cita es mañana · ${empresa.nombre}`,
+  html: plantilla({
+    titulo: 'Te esperamos mañana',
+    contenido:
+      parrafo(`Hola, ${esc(nombre)}. Te recordamos tu cita en el taller.`) +
+      tabla([['Fecha y hora', esc(fechaLarga(cita.fecha_hora))], ['Motivo', esc(cita.motivo)], ['Sucursal', esc(cita.sucursal ?? 'Principal')]]) +
+      parrafo(`<br>Si no puedes asistir, llámanos al ${esc(empresa.telefono)}.`),
+  }),
+});
+
+export const correoAlertaStock = ({ productos }) => ({
+  asunto: `Alerta de stock: ${productos.length} producto(s) agotados o por agotarse`,
+  html: plantilla({
+    titulo: 'Productos por reponer',
+    contenido:
+      parrafo('Estos productos de la tienda se agotaron o están por agotarse después de la última venta:') +
+      tabla(productos.map((p) => [esc(p.nombre), p.stock ? `${esc(p.stock)} u.` : '<strong style="color:#d1352b">Agotado</strong>'])) +
+      `<p style="margin:24px 0 0">${boton('Reponer en el panel', `${env.appUrl}/admin/productos`)}</p>`,
+  }),
+});
+
+export const correoPedidoCanceladoAuto = ({ nombre, pedido, horas }) => ({
+  asunto: `Cancelamos tu pedido ${codigoPedido(pedido.id)} · Bancada`,
+  html: plantilla({
+    titulo: 'Tu pedido fue cancelado',
+    contenido:
+      parrafo(`Hola, ${esc(nombre)}. El pedido <strong>${codigoPedido(pedido.id)}</strong> estuvo pendiente de pago más de ${esc(horas)} horas, así que lo cancelamos y liberamos los productos.`) +
+      parrafo('Si todavía lo quieres, puedes volver a hacer el pedido en la tienda.') +
+      `<p style="margin:24px 0 0">${boton('Ir a la tienda', `${env.appUrl}/tienda`)}</p>`,
+  }),
+});

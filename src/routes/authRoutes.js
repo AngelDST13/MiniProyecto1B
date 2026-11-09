@@ -1,7 +1,7 @@
 // Rutas de autenticación. Las de acceso son públicas; las de la cuenta requieren token.
 import { Router } from 'express';
 import {
-  actualizarPerfil, cambiarPassword, config, configurarDosPasos, login, loginGoogle, me, olvideContrasena,
+  actualizarPerfil, cambiarPassword, config, configurarDosPasos, login, loginGoogle, me, olvideContrasena, renovarSesion,
   reenviarVerificacion, register, restablecerContrasena, verificarCorreo, verificarDosPasos,
 } from '../controllers/authController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
@@ -22,6 +22,7 @@ router.post('/restablecer-contrasena', asyncHandler(restablecerContrasena));    
 
 // Cuenta del usuario autenticado
 router.get('/me', authMiddleware, asyncHandler(me));                            // GET  /api/auth/me
+router.post('/renovar', authMiddleware, asyncHandler(renovarSesion));           // POST /api/auth/renovar
 router.put('/perfil', authMiddleware, asyncHandler(actualizarPerfil));          // PUT  /api/auth/perfil
 router.put('/password', authMiddleware, asyncHandler(cambiarPassword));         // PUT  /api/auth/password
 router.put('/dos-pasos', authMiddleware, asyncHandler(configurarDosPasos));     // PUT  /api/auth/dos-pasos

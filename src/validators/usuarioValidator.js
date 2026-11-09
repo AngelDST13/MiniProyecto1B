@@ -1,5 +1,5 @@
 // Validación de entrada para las cuentas: registro, inicio de sesión, perfil y contraseñas.
-import { cedulaEcuatorianaValida, limpiarTexto, validarTextoObligatorio } from './helpers.js';
+import { cedulaCostaRicaValida, limpiarTexto, normalizarCedula, validarTextoObligatorio } from './helpers.js';
 
 const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REGEX_TELEFONO = /^\+?[0-9\s-]{7,15}$/;
@@ -18,7 +18,7 @@ export const validarPassword = (errores, campo, password) => {
 
 const validarCedula = (errores, cedula) => {
   if (!cedula) errores.cedula = 'La cédula es obligatoria';
-  else if (!cedulaEcuatorianaValida(cedula)) errores.cedula = 'La cédula no es válida (revisa los 10 dígitos)';
+  else if (!cedulaCostaRicaValida(cedula)) errores.cedula = 'Identificación no válida: cédula física (9 dígitos), jurídica (10) o DIMEX (11-12)';
 };
 
 const validarTelefono = (errores, telefono) => {
@@ -30,7 +30,7 @@ export const validarRegistro = (body = {}) => {
   const datos = {
     nombre: limpiarTexto(body.nombre),
     correo: limpiarTexto(body.correo).toLowerCase(),
-    cedula: limpiarTexto(body.cedula),
+    cedula: normalizarCedula(limpiarTexto(body.cedula)),
     telefono: limpiarTexto(body.telefono),
     // La contraseña NO se recorta: los espacios forman parte de ella.
     password: leerPassword(body.password),
@@ -64,7 +64,7 @@ export const validarPerfil = (body = {}, { cedulaActual }) => {
   validarTelefono(errores, datos.telefono);
   // La cédula solo se puede registrar una vez (por ejemplo, cuentas creadas con Google).
   if (!cedulaActual) {
-    datos.cedula = limpiarTexto(body.cedula);
+    datos.cedula = normalizarCedula(limpiarTexto(body.cedula));
     validarCedula(errores, datos.cedula);
   }
   return { datos, errores };

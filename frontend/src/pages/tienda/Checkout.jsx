@@ -1,7 +1,7 @@
 // Finalizar compra: entrega, pago, datos de contacto y confirmación del pedido.
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Banknote, CircleCheck, CreditCard, Landmark, Store, Truck } from 'lucide-react';
+import { Banknote, CircleCheck, CreditCard, Landmark, Smartphone, Store, Truck } from 'lucide-react';
 import { tiendaService } from '../../services/tiendaService.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useCarrito } from '../../hooks/useCarrito.js';
@@ -13,6 +13,7 @@ import { Button } from '../../components/ui/Button.jsx';
 import { ProductoImagen } from '../../components/tienda/ProductoImagen.jsx';
 
 const cargarCatalogo = () => tiendaService.catalogo();
+const cargarEmpresa = () => tiendaService.empresa();
 
 const Opcion = ({ activo, onClick, icono: Icono, titulo, texto, deshabilitado }) => (
   <button
@@ -32,20 +33,31 @@ const Opcion = ({ activo, onClick, icono: Icono, titulo, texto, deshabilitado })
   </button>
 );
 
-const Confirmacion = ({ pedido }) => (
+const DatosPago = ({ pedido, empresa }) => {
+  if (!empresa || !['SINPE Móvil', 'Transferencia'].includes(pedido.metodo_pago)) return null;
+  const sinpe = pedido.metodo_pago === 'SINPE Móvil';
+  return (
+    <div className="mt-6 rounded-2xl border border-line bg-panel p-5 text-left text-sm">
+      <p className="font-semibold">{sinpe ? 'Paga por SINPE Móvil' : 'Datos para la transferencia'}</p>
+      {sinpe ? (
+        <p className="mt-2 text-ink-soft">Número <span className="font-mono font-bold text-ink">{empresa.sinpe}</span> · a nombre de {empresa.nombre}</p>
+      ) : (
+        <p className="mt-2 text-ink-soft">IBAN <span className="font-mono font-bold text-ink">{empresa.iban}</span> · {empresa.nombre} · Cédula jurídica {empresa.cedulaJuridica}</p>
+      )}
+      <p className="mt-1 text-ink-soft">Monto: <strong className="text-ink">{formatMoney(pedido.total)}</strong> · Detalle: <span className="font-mono font-bold">{pedido.codigo}</span></p>
+      <p className="mt-2 text-xs text-muted">Envía el comprobante respondiendo el correo del pedido. Confirmamos tu pago en horario hábil.</p>
+    </div>
+  );
+};
+
+const Confirmacion = ({ pedido, empresa }) => (
   <div className="mx-auto max-w-xl animate-rise px-4 py-16 text-center">
     <span className="mx-auto grid size-20 animate-pop place-items-center rounded-3xl bg-st-reparado-soft text-st-reparado"><CircleCheck className="size-10" aria-hidden /></span>
     <h1 className="mt-6 text-4xl font-extrabold">¡Pedido recibido!</h1>
     <p className="mt-3 text-ink-soft">
       Tu pedido <strong className="font-mono">{pedido.codigo}</strong> por <strong>{formatMoney(pedido.total)}</strong> está registrado. Te enviamos el detalle a tu correo y te avisaremos cada vez que cambie de estado.
     </p>
-    {pedido.metodo_pago === 'Transferencia' && (
-      <div className="mt-6 rounded-2xl border border-line bg-panel p-5 text-left text-sm">
-        <p className="font-semibold">Datos para la transferencia</p>
-        <p className="mt-2 text-ink-soft">Banco Pichincha · Cuenta corriente 2100000000 · Bancada S.A. · RUC 1790000000001</p>
-        <p className="mt-1 text-ink-soft">Referencia: <span className="font-mono font-bold">{pedido.codigo}</span></p>
-      </div>
-    )}
+    <DatosPago pedido={pedido} empresa={empresa} />
     <div className="mt-8 flex flex-col justify-center gap-2 sm:flex-row">
       <Link to="/mi-cuenta/pedidos" className="inline-flex h-12 items-center justify-center rounded-xl bg-ink px-6 font-semibold text-paper hover:bg-ink-soft">Ver mis pedidos</Link>
       <Link to="/tienda" className="inline-flex h-12 items-center justify-center rounded-xl border border-line px-6 font-semibold hover:border-ink">Seguir comprando</Link>
@@ -57,27 +69,28 @@ export const Checkout = () => {
   const { usuario } = useAuth();
   const { items, subtotal, vaciar } = useCarrito();
   const { datos: catalogo } = useCargaAsync(cargarCatalogo);
+  const { datos: empresa } = useCargaAsync(cargarEmpresa);
   const [pedido, setPedido] = useState(null);
   const { valores, errores, enviando, cambiar, asignar, enviar } = useFormState({
     tipo_entrega: 'Retiro en tienda',
-    metodo_pago: 'Pago en tienda',
+    metodo_pago: 'SINPE Móvil',
     direccion: '',
     ciudad: '',
     telefono: usuario?.telefono ?? '',
     notas: '',
   });
 
-  if (pedido) return <Confirmacion pedido={pedido} />;
+  if (pedido) return <Confirmacion pedido={pedido} empresa={empresa?.data} />;
   if (items.length === 0) return <Navigate to="/carrito" replace />;
 
   const envioDomicilio = valores.tipo_entrega === 'Envío a domicilio';
-  const gratisDesde = catalogo?.envio.gratisDesde ?? 150;
-  const costoEnvio = envioDomicilio && subtotal < gratisDesde ? catalogo?.envio.costo ?? 5 : 0;
+  const gratisDesde = catalogo?.envio.gratisDesde ?? 75000;
+  const costoEnvio = envioDomicilio && subtotal < gratisDesde ? catalogo?.envio.costo ?? 2500 : 0;
 
   const elegirEntrega = (tipo) => {
     asignar('tipo_entrega', tipo);
     if (tipo === 'Retiro en tienda' && valores.metodo_pago === 'Contra entrega') asignar('metodo_pago', 'Pago en tienda');
-    if (tipo === 'Envío a domicilio' && valores.metodo_pago === 'Pago en tienda') asignar('metodo_pago', 'Transferencia');
+    if (tipo === 'Envío a domicilio' && valores.metodo_pago === 'Pago en tienda') asignar('metodo_pago', 'SINPE Móvil');
   };
 
   const alEnviar = enviar(async (datos) => {
@@ -97,22 +110,23 @@ export const Checkout = () => {
             <div className="grid gap-3 sm:grid-cols-2">
               <Opcion activo={!envioDomicilio} onClick={() => elegirEntrega('Retiro en tienda')} icono={Store} titulo="Retiro en tienda" texto="Gratis · listo en 24 h" />
               <Opcion activo={envioDomicilio} onClick={() => elegirEntrega('Envío a domicilio')} icono={Truck} titulo="Envío a domicilio"
-                texto={subtotal >= gratisDesde ? 'Gratis en este pedido' : `${formatMoney(catalogo?.envio.costo ?? 5)} · gratis desde ${formatMoney(gratisDesde)}`} />
+                texto={subtotal >= gratisDesde ? 'Gratis en este pedido' : `${formatMoney(catalogo?.envio.costo ?? 2500)} · gratis desde ${formatMoney(gratisDesde)}`} />
             </div>
             {errores.tipo_entrega && <p className="mt-2 text-sm text-danger">{errores.tipo_entrega}</p>}
             {envioDomicilio && (
               <div className="mt-4 grid animate-rise gap-4 sm:grid-cols-[1fr_200px]">
-                <TextInput id="direccion" name="direccion" label="Dirección completa" placeholder="Av. Amazonas N24-15 y Colón, casa 3"
+                <TextInput id="direccion" name="direccion" label="Dirección completa" placeholder="Del Parque Central 200 m norte, casa 12"
                   value={valores.direccion} onChange={cambiar} error={errores.direccion} required />
-                <TextInput id="ciudad" name="ciudad" label="Ciudad" placeholder="Quito" value={valores.ciudad} onChange={cambiar} error={errores.ciudad} required />
+                <TextInput id="ciudad" name="ciudad" label="Cantón / provincia" placeholder="San José" value={valores.ciudad} onChange={cambiar} error={errores.ciudad} required />
               </div>
             )}
           </section>
 
           <section>
             <h2 className="mb-3 text-lg font-bold">2 · ¿Cómo pagas?</h2>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Opcion activo={valores.metodo_pago === 'Transferencia'} onClick={() => asignar('metodo_pago', 'Transferencia')} icono={Landmark} titulo="Transferencia" texto="Te enviamos los datos" />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Opcion activo={valores.metodo_pago === 'SINPE Móvil'} onClick={() => asignar('metodo_pago', 'SINPE Móvil')} icono={Smartphone} titulo="SINPE Móvil" texto="Al instante desde tu banco" />
+              <Opcion activo={valores.metodo_pago === 'Transferencia'} onClick={() => asignar('metodo_pago', 'Transferencia')} icono={Landmark} titulo="Transferencia IBAN" texto="Te enviamos los datos" />
               <Opcion activo={valores.metodo_pago === 'Pago en tienda'} onClick={() => asignar('metodo_pago', 'Pago en tienda')} icono={CreditCard} titulo="Pago en tienda" texto="Efectivo o tarjeta" deshabilitado={envioDomicilio} />
               <Opcion activo={valores.metodo_pago === 'Contra entrega'} onClick={() => asignar('metodo_pago', 'Contra entrega')} icono={Banknote} titulo="Contra entrega" texto="Pagas al recibir" deshabilitado={!envioDomicilio} />
             </div>
@@ -121,7 +135,7 @@ export const Checkout = () => {
 
           <section className="grid gap-4">
             <h2 className="text-lg font-bold">3 · Contacto</h2>
-            <TextInput id="telefono" name="telefono" type="tel" label="Teléfono" value={valores.telefono} onChange={cambiar} error={errores.telefono} required />
+            <TextInput id="telefono" name="telefono" type="tel" label="Teléfono" placeholder="8888-8888" value={valores.telefono} onChange={cambiar} error={errores.telefono} required />
             <TextArea id="notas" name="notas" label="Notas para el pedido" hint="Opcional: referencias, horario de entrega…" value={valores.notas} onChange={cambiar} />
           </section>
         </div>

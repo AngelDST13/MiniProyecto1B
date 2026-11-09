@@ -26,6 +26,7 @@ export const env = {
     .map((origen) => origen.trim())
     .filter(Boolean),
   isProduction: process.env.NODE_ENV === 'production',
+  solicitudTimeoutMs: Number(process.env.SOLICITUD_TIMEOUT_MS ?? 120_000),
   db: {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT ?? 3306),
@@ -36,10 +37,15 @@ export const env = {
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN ?? '8h',
+    // La sesión se cierra tras estos minutos SIN actividad (el frontend renueva el token mientras se usa)
+    inactividadMinutos: Number(process.env.INACTIVIDAD_MINUTOS ?? 15),
+    // Duración máxima absoluta de una sesión, aunque haya actividad
+    maximoHoras: Number(process.env.SESION_MAX_HORAS ?? 8),
+    maximoHorasRecordar: 24 * 30,
   },
   // URL pública del frontend: se usa en los enlaces de los correos (confirmar correo, restablecer contraseña…)
   appUrl: (process.env.APP_URL || 'http://localhost:5173').replace(/\/$/, ''),
-  zonaHoraria: process.env.ZONA_HORARIA || 'America/Guayaquil',
+  zonaHoraria: process.env.ZONA_HORARIA || 'America/Costa_Rica',
   // Correo (Gmail con contraseña de aplicación). Sin SMTP_USER/SMTP_PASS los correos se
   // "simulan": se guardan en el registro de correos para verlos en el panel, sin enviarse.
   correo: {

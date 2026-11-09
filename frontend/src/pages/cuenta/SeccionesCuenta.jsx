@@ -1,7 +1,7 @@
 // Secciones del portal del cliente.
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Laptop, PackageOpen, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { FileText, Laptop, PackageOpen, Receipt, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { portalService } from '../../services/tiendaService.js';
 import { authService } from '../../services/authService.js';
 import { useAuth } from '../../hooks/useAuth.js';
@@ -182,6 +182,9 @@ export const MisEquipos = () => {
               <p className="mt-4 text-sm text-muted">Ingresó el {formatDate(o.fecha_ingreso)} · actualizado {formatDate(o.updated_at)}</p>
               <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-4">
                 {o.ultima_solicitud && <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${ESTILO_SOLICITUD[o.ultima_solicitud]}`}>Informe: {o.ultima_solicitud}</span>}
+                {o.ultima_solicitud === 'Aprobada' && (
+                  <Link to={`/documentos/orden/${o.id}`} className="inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] font-semibold text-signal-deep hover:bg-signal-soft">Ver informe</Link>
+                )}
                 <Button variante="borde" tamano="sm" icono={FileText} className="ml-auto" disabled={o.ultima_solicitud === 'Pendiente'} onClick={() => setSolicitando(o)}>
                   {o.ultima_solicitud === 'Pendiente' ? 'Solicitud en revisión' : 'Solicitar informe'}
                 </Button>
@@ -284,5 +287,36 @@ export const SeguridadCuenta = () => {
         </form>
       </Tarjeta>
     </div>
+  );
+};
+
+// ---------------------------------------------------------------------
+const cargarFacturas = () => portalService.facturas();
+
+export const MisFacturas = () => {
+  const { datos, error, recargar } = useCargaAsync(cargarFacturas);
+  if (error) return <ErrorState mensaje={error} onRetry={recargar} />;
+  if (!datos) return <Skeleton className="h-48" />;
+  if (!datos.data.length) {
+    return <EmptyState icono={Receipt} titulo="Aún no tienes facturas" texto="Cuando recibas un pedido o retires tu equipo del taller, tu factura aparecerá aquí y en tu correo." />;
+  }
+  return (
+    <ul className="grid gap-3 md:grid-cols-2">
+      {datos.data.map((f, i) => (
+        <li key={f.id} style={{ animationDelay: `${i * 40}ms` }} className="animate-rise">
+          <Link to={`/documentos/factura/${f.id}`} className="group flex items-center gap-4 rounded-3xl border border-line bg-panel p-5 shadow-ticket transition hover:-translate-y-0.5 hover:shadow-lift">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-paper-deep text-ink-soft transition group-hover:bg-signal-soft group-hover:text-signal-deep"><Receipt className="size-5" aria-hidden /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-mono text-sm font-bold">{f.consecutivo}</span>
+              <span className="block truncate text-sm text-muted">{f.tipo === 'pedido' ? 'Compra en la tienda' : 'Servicio técnico'} · {formatDate(f.created_at)}</span>
+            </span>
+            <span className="text-right">
+              <span className="block font-mono font-semibold">{formatMoney(f.total)}</span>
+              {f.estado === 'Anulada' && <span className="text-xs font-semibold text-danger">Anulada</span>}
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 };

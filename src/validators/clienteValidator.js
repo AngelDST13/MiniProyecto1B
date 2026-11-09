@@ -5,14 +5,14 @@ import { limpiarTexto, validarTextoObligatorio } from './helpers.js';
 
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REGEX_TELEFONO = /^\+?[0-9\s-]{7,15}$/;
-const REGEX_CEDULA = /^[0-9]{6,13}$/;
+const REGEX_CEDULA = /^[0-9]{9,12}$/;
 
 export const validarCliente = (body = {}) => {
   const datos = {
     nombre: limpiarTexto(body.nombre),
     telefono: limpiarTexto(body.telefono),
     email: limpiarTexto(body.email).toLowerCase(),
-    cedula: limpiarTexto(body.cedula),
+    cedula: limpiarTexto(body.cedula).replace(/[\s-]/g, ''),
   };
 
   const errores = {};
@@ -30,7 +30,7 @@ export const validarCliente = (body = {}) => {
     errores.email = 'El email no tiene un formato válido';
   }
   if (!errores.cedula && !REGEX_CEDULA.test(datos.cedula)) {
-    errores.cedula = 'La cédula debe contener solo números (entre 6 y 13 dígitos)';
+    errores.cedula = 'La identificación debe tener entre 9 y 12 dígitos (cédula física, jurídica o DIMEX)';
   }
 
   return { datos, errores };

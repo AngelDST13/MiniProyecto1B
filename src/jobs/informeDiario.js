@@ -6,6 +6,7 @@ import { env } from '../config/env.js';
 import { pool } from '../config/db.js';
 import { configuracion } from '../services/configuracionService.js';
 import { enviarInformeDiario, horaLocal } from '../services/informes/informeDiarioService.js';
+import { ejecutarReglasPeriodicas, recordarCitas } from './automatizaciones.js';
 
 let ejecutando = false;
 
@@ -31,7 +32,22 @@ const revisar = async () => {
   }
 };
 
+// Recordatorio de citas: una vez al día a las 08:00 (hora del taller)
+const recordarUnaVez = async () => {
+  try {
+    const [[{ hoy }]] = await pool.query("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d') AS hoy");
+    if ((await configuracion.obtener('recordatorio_citas_ultimo_envio')) === hoy) return;
+    await recordarCitas();
+    await configuracion.guardarInterno('recordatorio_citas_ultimo_envio', hoy);
+  } catch (error) {
+    console.error('[recordatorio de citas] error:', error.message);
+  }
+};
+
 export const iniciarTareasProgramadas = () => {
   cron.schedule('* * * * *', revisar, { timezone: env.zonaHoraria });
-  console.log(`Tareas programadas activas (informe diario, zona ${env.zonaHoraria})`);
+  cron.schedule('5 * * * *', ejecutarReglasPeriodicas, { timezone: env.zonaHoraria }); // cada hora
+  cron.schedule('0 8 * * *', recordarUnaVez, { timezone: env.zonaHoraria });
+  setTimeout(ejecutarReglasPeriodicas, 5000); // también al iniciar
+  console.log(`Tareas programadas activas (informe diario, reglas automáticas, zona ${env.zonaHoraria})`);
 };

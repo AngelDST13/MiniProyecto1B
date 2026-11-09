@@ -1,7 +1,7 @@
 // Automatización: configuración del informe diario y avisos, estado del correo (Gmail),
 // vista previa del informe y registro de todos los correos enviados.
 import { useCallback, useState } from 'react';
-import { CircleCheck, Eye, Mail, PlugZap, Send, TriangleAlert } from 'lucide-react';
+import { CircleCheck, Eye, Mail, PlugZap, Send, Sparkles, TriangleAlert } from 'lucide-react';
 import { gestionService } from '../../services/tiendaService.js';
 import { useCargaAsync } from '../../hooks/useCargaAsync.js';
 import { useToast } from '../../hooks/useToast.js';
@@ -13,9 +13,10 @@ import { TextInput } from '../../components/ui/Field.jsx';
 import { Toggle } from '../../components/ui/Toggle.jsx';
 import { Modal } from '../../components/ui/Modal.jsx';
 import { VistaCorreo } from '../../components/gestion/VistaCorreo.jsx';
+import { ReglasAutomaticas } from '../../components/gestion/ReglasAutomaticas.jsx';
 
 const cargarConfig = () => gestionService.configuracion();
-const TIPOS = { verificacion: 'Confirmar correo', recuperacion: 'Recuperar clave', codigo_2fa: 'Código 2FA', nuevo_inicio: 'Nuevo inicio', cuenta_bloqueada: 'Cuenta bloqueada', pedido_recibido: 'Pedido recibido', pedido_estado: 'Estado de pedido', informe_cliente: 'Informe a cliente', solicitud_rechazada: 'Solicitud rechazada', informe_diario: 'Informe diario' };
+const TIPOS = { verificacion: 'Confirmar correo', recuperacion: 'Recuperar clave', codigo_2fa: 'Código 2FA', nuevo_inicio: 'Nuevo inicio', cuenta_bloqueada: 'Cuenta bloqueada', pedido_recibido: 'Pedido recibido', pedido_estado: 'Estado de pedido', informe_cliente: 'Informe a cliente', solicitud_rechazada: 'Solicitud rechazada', informe_diario: 'Informe diario', factura: 'Factura', recordatorio_cita: 'Recordatorio de cita', alerta_stock: 'Alerta de stock', pedido_cancelado_auto: 'Pedido cancelado' };
 const ESTILO_ESTADO = { Enviado: 'bg-st-reparado-soft text-st-reparado', Simulado: 'bg-st-recibido-soft text-st-recibido', Error: 'bg-danger-soft text-danger' };
 
 const Tarjeta = ({ titulo, descripcion, children, className = '' }) => (
@@ -57,8 +58,8 @@ const Configuracion = ({ inicial, onGuardado }) => {
       </div>
       <Toggle id="cfg-aviso" label={campos.notificar_inicio_sesion.etiqueta} checked={valores.notificar_inicio_sesion === '1'} onChange={(v) => poner('notificar_inicio_sesion', v ? '1' : '0')} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextInput id="cfg-envio" type="number" min="0" step="0.01" label="Costo de envío (USD)" value={valores.tienda_costo_envio} onChange={(e) => poner('tienda_costo_envio', e.target.value)} />
-        <TextInput id="cfg-gratis" type="number" min="0" step="0.01" label="Envío gratis desde (USD)" value={valores.tienda_envio_gratis_desde} onChange={(e) => poner('tienda_envio_gratis_desde', e.target.value)} />
+        <TextInput id="cfg-envio" type="number" min="0" step="100" label="Costo de envío (₡)" value={valores.tienda_costo_envio} onChange={(e) => poner('tienda_costo_envio', e.target.value)} />
+        <TextInput id="cfg-gratis" type="number" min="0" step="1000" label="Envío gratis desde (₡)" value={valores.tienda_envio_gratis_desde} onChange={(e) => poner('tienda_envio_gratis_desde', e.target.value)} />
       </div>
       <Button type="submit" cargando={guardando}>Guardar configuración</Button>
     </form>
@@ -90,7 +91,11 @@ export const Automatizacion = () => {
     if (data.ok) toast.exito(data.mensaje);
     else toast.error(data.mensaje);
   });
-  const previa = () => accion('previa', async () => setVista({ titulo: 'Informe diario (vista previa)', html: (await gestionService.vistaPreviaInforme()).data.html }));
+  const previa = (conIA = false) => accion(conIA ? 'previa-ia' : 'previa', async () => {
+    const { data } = await gestionService.vistaPreviaInforme(conIA);
+    if (conIA && !data.analisisIA) toast.error('La IA no está disponible ahora mismo (revisa la API key o el saldo). El informe se envía sin esa sección.');
+    setVista({ titulo: 'Informe diario (vista previa)', html: data.html });
+  });
   const enviarAhora = () => accion('enviar', async () => { toast.exito((await gestionService.enviarInforme()).message); correos.recargar(); });
   const abrirCorreo = (id) => accion(`correo-${id}`, async () => {
     const { data } = await gestionService.correo(id);
@@ -101,7 +106,9 @@ export const Automatizacion = () => {
 
   return (
     <div className="animate-rise">
-      <PageHeader etiqueta="Gestión" titulo="Automatización" descripcion="Informes diarios, avisos por correo y el registro de cada mensaje que envía el sistema." />
+      <PageHeader etiqueta="Gestión" titulo="Automatización" descripcion="Reglas que trabajan solas, informes diarios, avisos por correo y el registro de cada mensaje que envía el sistema." />
+
+      <div className="mb-4"><ReglasAutomaticas /></div>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <Tarjeta titulo="Informe diario y avisos" descripcion="Se envía solo a la hora configurada (zona horaria del taller).">
@@ -126,7 +133,8 @@ export const Automatizacion = () => {
           </Tarjeta>
           <Tarjeta titulo="Informe de hoy" descripcion="Revísalo o envíalo ahora sin esperar la hora programada.">
             <div className="flex flex-wrap gap-2">
-              <Button variante="borde" icono={Eye} cargando={ocupado === 'previa'} onClick={previa}>Vista previa</Button>
+              <Button variante="borde" icono={Eye} cargando={ocupado === 'previa'} onClick={() => previa(false)}>Vista previa</Button>
+              <Button variante="borde" icono={Sparkles} cargando={ocupado === 'previa-ia'} onClick={() => previa(true)}>Con análisis IA</Button>
               <Button variante="senal" icono={Send} cargando={ocupado === 'enviar'} onClick={enviarAhora}>Enviar ahora</Button>
             </div>
           </Tarjeta>

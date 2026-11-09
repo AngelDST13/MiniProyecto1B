@@ -126,7 +126,7 @@ export const Producto = () => {
   const cargar = useCallback(() => tiendaService.producto(slug), [slug]);
   const { datos, error, recargar } = useCargaAsync(cargar);
 
-  if (error?.includes('no encontrado')) return <NotFound />;
+  if (error?.includes('no encontrado')) return <NotFound embebida />;
   if (error) return <div className="mx-auto max-w-3xl p-8"><ErrorState mensaje={error} onRetry={recargar} /></div>;
   if (!datos) {
     return (

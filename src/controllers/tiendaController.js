@@ -5,11 +5,12 @@ import { UsuarioModel } from '../models/usuarioModel.js';
 import { configuracion } from '../services/configuracionService.js';
 import { enviarCorreo } from '../services/correo/correoService.js';
 import { correoPedidoRecibido } from '../services/correo/plantillas.js';
+import { alertarStock } from '../jobs/automatizaciones.js';
 import { AppError } from '../utils/AppError.js';
 import { assertValido } from '../utils/assertValido.js';
 import { limpiarTexto } from '../validators/helpers.js';
 
-const METODOS_PAGO = ['Transferencia', 'Pago en tienda', 'Contra entrega'];
+const METODOS_PAGO = ['SINPE Móvil', 'Transferencia', 'Pago en tienda', 'Contra entrega'];
 const TIPOS_ENTREGA = ['Retiro en tienda', 'Envío a domicilio'];
 const REGEX_TELEFONO = /^\+?[0-9\s-]{7,15}$/;
 
@@ -54,8 +55,8 @@ export const getCatalogo = async (req, res) => {
     ProductoModel.categorias(),
     ProductoModel.marcas(),
     ProductoModel.rangoPrecios(),
-    configuracion.obtener('tienda_costo_envio', '5.00'),
-    configuracion.obtener('tienda_envio_gratis_desde', '150.00'),
+    configuracion.obtener('tienda_costo_envio', '2500.00'),
+    configuracion.obtener('tienda_envio_gratis_desde', '75000.00'),
   ]);
   res.status(200).json({
     categorias,
@@ -114,10 +115,27 @@ export const crearPedido = async (req, res) => {
   assertValido(errores, 'Revisa los datos del pedido');
 
   const pedido = await PedidoModel.crear(usuario.id, datos, {
-    costoEnvio: Number(await configuracion.obtener('tienda_costo_envio', '5.00')),
-    envioGratisDesde: Number(await configuracion.obtener('tienda_envio_gratis_desde', '150.00')),
+    costoEnvio: Number(await configuracion.obtener('tienda_costo_envio', '2500.00')),
+    envioGratisDesde: Number(await configuracion.obtener('tienda_envio_gratis_desde', '75000.00')),
   });
-  enviarCorreo({ para: usuario.correo, tipo: 'pedido_recibido', ...correoPedidoRecibido({ nombre: usuario.nombre, pedido }) });
+  const empresa = await configuracion.empresa();
+  enviarCorreo({ para: usuario.correo, tipo: 'pedido_recibido', ...correoPedidoRecibido({ nombre: usuario.nombre, pedido, empresa }) });
+  alertarStock(datos.items.map((i) => i.producto_id));
 
   res.status(201).json({ message: `Pedido ${pedido.codigo} recibido`, data: pedido });
+};
+
+// Orden de los pasos del armador de PC
+const PASOS_ARMADOR = ['cpu', 'motherboard', 'ram', 'gpu', 'almacenamiento', 'fuente', 'gabinete', 'enfriamiento'];
+
+/** GET /api/tienda/armador — componentes activos agrupados por tipo, con sus datos de compatibilidad */
+export const getArmador = async (req, res) => {
+  const componentes = await ProductoModel.componentesPc();
+  const porTipo = Object.fromEntries(PASOS_ARMADOR.map((tipo) => [tipo, componentes.filter((c) => c.pc_tipo === tipo)]));
+  res.status(200).json({ pasos: PASOS_ARMADOR, data: porTipo });
+};
+
+/** GET /api/tienda/empresa — datos públicos del negocio (pie de página, datos de pago, documentos) */
+export const getEmpresa = async (req, res) => {
+  res.status(200).json({ data: await configuracion.empresa() });
 };

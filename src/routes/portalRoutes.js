@@ -1,7 +1,7 @@
 // Portal del cliente (cualquier usuario autenticado ve solo lo suyo).
 import { Router } from 'express';
 import {
-  cancelarMiPedido, crearSolicitud, getMiPedido, getMisOrdenes, getMisPedidos, getMisSolicitudes,
+  cancelarMiPedido, crearSolicitud, getMisFacturas, getMiPedido, getMisOrdenes, getMisPedidos, getMisSolicitudes,
 } from '../controllers/portalController.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -13,5 +13,7 @@ router.post('/pedidos/:id/cancelar', asyncHandler(cancelarMiPedido));        // 
 router.get('/ordenes', asyncHandler(getMisOrdenes));                         // GET  /api/portal/ordenes
 router.get('/solicitudes', asyncHandler(getMisSolicitudes));                 // GET  /api/portal/solicitudes
 router.post('/solicitudes', asyncHandler(crearSolicitud));                   // POST /api/portal/solicitudes
+
+router.get('/facturas', asyncHandler(getMisFacturas));                       // GET  /api/portal/facturas
 
 export default router;

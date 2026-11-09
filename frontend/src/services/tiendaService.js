@@ -1,5 +1,5 @@
 // Tienda en línea, portal del cliente y gestión de administración.
-import { request } from './api.js';
+import { TIMEOUT_IA_MS, request } from './api.js';
 
 const consulta = (parametros) => {
   const limpios = Object.entries(parametros).filter(([, v]) => v !== undefined && v !== null && v !== '' && v !== false);
@@ -11,6 +11,8 @@ export const tiendaService = {
   productos: (filtros) => request(`/tienda/productos${consulta(filtros)}`, { auth: false }),
   producto: (slug) => request(`/tienda/productos/${encodeURIComponent(slug)}`, { auth: false }),
   crearPedido: (pedido) => request('/tienda/pedidos', { method: 'POST', body: pedido }),
+  armador: () => request('/tienda/armador', { auth: false }),
+  empresa: () => request('/tienda/empresa', { auth: false }),
 };
 
 export const portalService = {
@@ -19,6 +21,7 @@ export const portalService = {
   cancelarPedido: (id) => request(`/portal/pedidos/${id}/cancelar`, { method: 'POST' }),
   ordenes: () => request('/portal/ordenes'),
   solicitudes: () => request('/portal/solicitudes'),
+  facturas: () => request('/portal/facturas'),
   solicitarInforme: (ordenId, mensaje) => request('/portal/solicitudes', { method: 'POST', body: { orden_id: ordenId, mensaje } }),
 };
 
@@ -36,6 +39,20 @@ export const gestionService = {
   probarCorreo: () => request('/gestion/correos/probar', { method: 'POST' }),
   configuracion: () => request('/gestion/configuracion'),
   guardarConfiguracion: (cambios) => request('/gestion/configuracion', { method: 'PUT', body: cambios }),
-  vistaPreviaInforme: () => request('/gestion/informe-diario/vista-previa'),
-  enviarInforme: () => request('/gestion/informe-diario/enviar', { method: 'POST' }),
+  vistaPreviaInforme: (conIA = false) => request(`/gestion/informe-diario/vista-previa${conIA ? '?ia=1' : ''}`, { timeoutMs: TIMEOUT_IA_MS }),
+  sugerirNota: (id) => request(`/gestion/solicitudes/${id}/sugerir-nota`, { method: 'POST', timeoutMs: TIMEOUT_IA_MS }),
+  facturas: () => request('/gestion/facturas'),
+  facturables: () => request('/gestion/facturables'),
+  emitirFactura: (tipo, id, enviar = true) => request('/gestion/facturas', { method: 'POST', body: { tipo, id, enviar } }),
+  reenviarFactura: (id) => request(`/gestion/facturas/${id}/enviar`, { method: 'POST' }),
+  anularFactura: (id) => request(`/gestion/facturas/${id}/anular`, { method: 'PATCH' }),
+  analisisIA: (dias) => request('/gestion/ia/analisis', { method: 'POST', body: { dias }, timeoutMs: TIMEOUT_IA_MS }),
+  automatizacion: () => request('/gestion/automatizacion'),
+  ejecutarAutomatizacion: () => request('/gestion/automatizacion/ejecutar', { method: 'POST' }),
+  enviarInforme: () => request('/gestion/informe-diario/enviar', { method: 'POST', timeoutMs: TIMEOUT_IA_MS }),
+};
+
+export const documentoService = {
+  factura: (id) => request(`/documentos/factura/${id}`),
+  informeOrden: (id) => request(`/documentos/orden/${id}`),
 };

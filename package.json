@@ -10,7 +10,8 @@
     "dev:all": "node scripts/dev.mjs",
     "lint": "eslint .",
     "lint:md": "markdownlint-cli2 \"README.md\" \"docs/**/*.md\"",
-    "test:agente": "node scripts/probar-agente.mjs"
+    "test:agente": "node scripts/probar-agente.mjs",
+    "test:estados": "node scripts/probar-estados-http.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -147,10 +147,47 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
   .revelar {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Ventiladores del armador de PC */
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+.ventilador {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: girar 1.4s linear infinite;
+}
+
+/* Documentos imprimibles (facturas, informes, cotizaciones): hoja carta */
+@page {
+  size: letter;
+  margin: 12mm;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .no-imprimir {
+    display: none !important;
+  }
+  .hoja {
+    box-shadow: none !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .hoja * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

@@ -3,7 +3,8 @@ import { Router } from 'express';
 import {
   aprobarSolicitud, cambiarEstadoPedido, enviarInformeAhora, getConfiguracion, getCorreo, getCorreos, getDashboard,
   getPedido, getPedidos, getSolicitudes, probarCorreo, putConfiguracion, rechazarSolicitud, vistaPreviaInforme,
-  vistaPreviaSolicitud,
+  vistaPreviaSolicitud, getFacturas, emitirFactura, reenviarFactura, anularFactura, getFacturables, analisisIA, sugerirNota,
+  getAutomatizacion, ejecutarAutomatizacion,
 } from '../controllers/gestionController.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -29,5 +30,18 @@ router.put('/configuracion', asyncHandler(putConfiguracion));
 
 router.get('/informe-diario/vista-previa', asyncHandler(vistaPreviaInforme));
 router.post('/informe-diario/enviar', asyncHandler(enviarInformeAhora));
+
+router.post('/solicitudes/:id/sugerir-nota', asyncHandler(sugerirNota));
+
+router.get('/facturas', asyncHandler(getFacturas));
+router.post('/facturas', asyncHandler(emitirFactura));
+router.get('/facturables', asyncHandler(getFacturables));
+router.post('/facturas/:id/enviar', asyncHandler(reenviarFactura));
+router.patch('/facturas/:id/anular', asyncHandler(anularFactura));
+
+router.post('/ia/analisis', asyncHandler(analisisIA));
+
+router.get('/automatizacion', asyncHandler(getAutomatizacion));
+router.post('/automatizacion/ejecutar', asyncHandler(ejecutarAutomatizacion));
 
 export default router;

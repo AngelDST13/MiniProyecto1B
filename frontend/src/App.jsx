@@ -2,7 +2,8 @@
 //   públicas        → inicio, tienda, carrito, acceso (login, registro, correo, contraseña)
 //   cualquier sesión → checkout y portal del cliente (/mi-cuenta)
 //   personal        → panel del taller y administración
-//   solo admin      → /gestion (dashboard, pedidos, solicitudes, automatización)
+//   solo admin      → /gestion (dashboard, pedidos, facturas, solicitudes, automatización)
+//   documentos      → factura e informe técnico (con sesión), cotización del armador (pública)
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Loader } from './components/ui/Loader.jsx';
@@ -40,6 +41,12 @@ const Dashboard = perezoso(() => import('./pages/gestion/Dashboard.jsx'), 'Dashb
 const PedidosGestion = perezoso(() => import('./pages/gestion/PedidosGestion.jsx'), 'PedidosGestion');
 const SolicitudesGestion = perezoso(() => import('./pages/gestion/SolicitudesGestion.jsx'), 'SolicitudesGestion');
 const Automatizacion = perezoso(() => import('./pages/gestion/Automatizacion.jsx'), 'Automatizacion');
+const FacturasGestion = perezoso(() => import('./pages/gestion/FacturasGestion.jsx'), 'FacturasGestion');
+const MisFacturas = perezoso(() => import('./pages/cuenta/SeccionesCuenta.jsx'), 'MisFacturas');
+const Armador = perezoso(() => import('./pages/tienda/Armador.jsx'), 'Armador');
+const DocumentoFactura = perezoso(() => import('./pages/documentos/Documentos.jsx'), 'DocumentoFactura');
+const DocumentoInformeOrden = perezoso(() => import('./pages/documentos/Documentos.jsx'), 'DocumentoInformeOrden');
+const DocumentoCotizacion = perezoso(() => import('./pages/documentos/Documentos.jsx'), 'DocumentoCotizacion');
 
 export const App = () => (
   <Suspense fallback={<div className="grid min-h-[60dvh] place-items-center"><Loader /></div>}>
@@ -53,12 +60,16 @@ export const App = () => (
     <Route path="/restablecer-contrasena" element={<RestablecerContrasena />} />
     <Route element={<RutaProtegida />}>
       <Route path="/completar-perfil" element={<CompletarPerfil />} />
+      <Route path="/documentos/factura/:id" element={<DocumentoFactura />} />
+      <Route path="/documentos/orden/:id" element={<DocumentoInformeOrden />} />
     </Route>
+    <Route path="/documentos/cotizacion" element={<DocumentoCotizacion />} />
 
     {/* Tienda y portal del cliente */}
     <Route element={<LayoutPublico />}>
       <Route path="/tienda" element={<Tienda />} />
       <Route path="/tienda/producto/:slug" element={<Producto />} />
+      <Route path="/tienda/arma-tu-pc" element={<Armador />} />
       <Route path="/carrito" element={<Carrito />} />
       <Route element={<RutaProtegida />}>
         <Route path="/checkout" element={<Checkout />} />
@@ -66,6 +77,7 @@ export const App = () => (
           <Route index element={<ResumenCuenta />} />
           <Route path="pedidos" element={<MisPedidos />} />
           <Route path="equipos" element={<MisEquipos />} />
+          <Route path="facturas" element={<MisFacturas />} />
           <Route path="seguridad" element={<SeguridadCuenta />} />
         </Route>
       </Route>
@@ -85,6 +97,7 @@ export const App = () => (
           <Route path="/gestion/pedidos" element={<PedidosGestion />} />
           <Route path="/gestion/solicitudes" element={<SolicitudesGestion />} />
           <Route path="/gestion/automatizacion" element={<Automatizacion />} />
+          <Route path="/gestion/facturas" element={<FacturasGestion />} />
         </Route>
       </Route>
     </Route>

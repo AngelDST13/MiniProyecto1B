@@ -44,7 +44,7 @@ export const TicketIlustrado = ({ className = '' }) => (
         <p className="text-xs text-muted">Repuestos</p>
         <p className="text-sm font-semibold">Pantalla 14" IPS · Pasta térmica</p>
       </div>
-      <p className="font-display text-xl font-extrabold">$128.50</p>
+      <p className="font-display text-xl font-extrabold">₡65 900</p>
     </div>
   </div>
 );

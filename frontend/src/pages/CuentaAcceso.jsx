@@ -127,8 +127,8 @@ export const CompletarPerfil = () => {
     <AuthShell titulo="Completa tu perfil" subtitulo="Necesitamos tu cédula para vincular tus compras y equipos.">
       <form onSubmit={alEnviar} className="space-y-4" noValidate>
         <TextInput id="nombre" name="nombre" label="Nombre completo" value={valores.nombre} onChange={cambiar} error={errores.nombre} required />
-        <TextInput id="cedula" name="cedula" label="Cédula" inputMode="numeric" maxLength={10} value={valores.cedula} onChange={cambiar} required
-          error={errores.cedula ?? (valores.cedula.length === 10 && !cedulaValida(valores.cedula) ? 'Esta cédula no es válida' : undefined)} />
+        <TextInput id="cedula" name="cedula" label="Cédula" inputMode="numeric" maxLength={14} placeholder="1-0234-0567" value={valores.cedula} onChange={cambiar} required
+          error={errores.cedula ?? (valores.cedula.replace(/\D/g, '').length >= 9 && !cedulaValida(valores.cedula) ? 'Usa tu cédula física (9 dígitos), jurídica (10) o DIMEX' : undefined)} />
         <TextInput id="telefono" name="telefono" type="tel" label="Teléfono" value={valores.telefono} onChange={cambiar} error={errores.telefono} required />
         {!errores.cedula && !errores.telefono && !errores.nombre && <FormError mensaje={errores._form} />}
         <Button type="submit" variante="senal" tamano="lg" cargando={enviando} className="w-full">Guardar y continuar</Button>

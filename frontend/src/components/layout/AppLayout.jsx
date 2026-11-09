@@ -9,7 +9,7 @@ import { Logo } from './Logo.jsx';
 import { seccionesMovil, seccionesPara } from './navegacion.js';
 import { AgenteFlotante } from '../agente/AgenteFlotante.jsx';
 
-const fechaTurno = new Intl.DateTimeFormat('es-EC', { weekday: 'short', day: '2-digit', month: 'short' });
+const fechaTurno = new Intl.DateTimeFormat('es-CR', { weekday: 'short', day: '2-digit', month: 'short' });
 
 const useCerrarSesion = () => {
   const { logout } = useAuth();

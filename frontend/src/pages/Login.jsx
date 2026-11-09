@@ -79,7 +79,7 @@ const PasoCodigo = ({ desafio, onVolver, onListo }) => {
 };
 
 export const Login = () => {
-  const { usuario, login, loginGoogle, sesionVencida } = useAuth();
+  const { usuario, login, loginGoogle, motivoCierre } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -119,9 +119,11 @@ export const Login = () => {
 
   return (
     <AuthShell titulo="Iniciar sesión" subtitulo="Accede a tu cuenta de Bancada.">
-      {sesionVencida && (
-        <p className="mb-5 rounded-xl border border-st-diagnostico/40 bg-st-diagnostico-soft px-3.5 py-2.5 text-sm text-[#7a5200]">
-          Tu sesión venció. Vuelve a iniciar sesión para continuar.
+      {motivoCierre && (
+        <p role="status" className="mb-5 rounded-xl border border-st-diagnostico/40 bg-st-diagnostico-soft px-3.5 py-2.5 text-sm text-[#7a5200]">
+          {motivoCierre === 'inactividad'
+            ? 'Cerramos tu sesión tras 15 minutos sin actividad para proteger tu cuenta. Inicia sesión de nuevo para continuar.'
+            : 'Tu sesión venció. Vuelve a iniciar sesión para continuar.'}
         </p>
       )}
 

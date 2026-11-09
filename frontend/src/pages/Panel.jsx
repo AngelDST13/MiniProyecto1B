@@ -19,7 +19,7 @@ const saludo = () => {
   return 'Buenas noches';
 };
 
-const fechaLarga = new Intl.DateTimeFormat('es-EC', { weekday: 'long', day: 'numeric', month: 'long' });
+const fechaLarga = new Intl.DateTimeFormat('es-CR', { weekday: 'long', day: 'numeric', month: 'long' });
 
 // Definida fuera del componente: es estable y no necesita useCallback.
 const cargarResumen = async () => {

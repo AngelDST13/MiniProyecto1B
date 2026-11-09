@@ -2,6 +2,7 @@
 // Todo se filtra por el usuario de la sesión: un cliente nunca ve datos de otro.
 import { pool } from '../config/db.js';
 import { PedidoModel } from '../models/pedidoModel.js';
+import { FacturaModel } from '../services/facturaService.js';
 import { AppError } from '../utils/AppError.js';
 import { parseId } from '../utils/parseId.js';
 import { limpiarTexto } from '../validators/helpers.js';
@@ -69,4 +70,10 @@ export const crearSolicitud = async (req, res) => {
 
   const [resultado] = await pool.execute('INSERT INTO solicitudes_informe (usuario_id, orden_id, mensaje) VALUES (?, ?, ?)', [req.usuario.id, ordenId, mensaje]);
   res.status(201).json({ message: 'Solicitud enviada. El taller la revisará y recibirás el informe por correo.', data: { id: resultado.insertId } });
+};
+
+/** GET /api/portal/facturas — facturas de sus compras y de sus equipos reparados */
+export const getMisFacturas = async (req, res) => {
+  const facturas = await FacturaModel.listar({ usuarioId: req.usuario.id, clienteId: req.usuario.cliente_id });
+  res.status(200).json({ total: facturas.length, data: facturas });
 };

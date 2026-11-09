@@ -51,6 +51,7 @@ const NavPublica = () => {
         <Link to="/" aria-label="Bancada · inicio"><Logo /></Link>
         <nav className="ml-4 hidden items-center gap-6 lg:flex" aria-label="Principal">
           <NavLink to="/tienda" className={enlace} end>Tienda</NavLink>
+          <NavLink to="/tienda/arma-tu-pc" className={enlace}>Arma tu PC</NavLink>
           <NavLink to="/tienda?oferta=1" className={() => enlace({ isActive: false })}>Ofertas</NavLink>
           <a href="/#flujo" className={enlace({ isActive: false })}>Servicio técnico</a>
         </nav>
@@ -115,7 +116,8 @@ const Pie = () => (
         <p className="font-mono text-[11px] font-bold tracking-[0.18em] text-paper/50 uppercase">Tienda</p>
         <ul className="mt-3 space-y-2 text-sm text-paper/75">
           <li><Link to="/tienda?categoria=laptops" className="hover:text-signal">Laptops</Link></li>
-          <li><Link to="/tienda?categoria=componentes" className="hover:text-signal">Componentes</Link></li>
+          <li><Link to="/tienda/arma-tu-pc" className="hover:text-signal">Arma tu PC</Link></li>
+          <li><Link to="/tienda?categoria=tarjetas-de-video" className="hover:text-signal">Tarjetas de video</Link></li>
           <li><Link to="/tienda?oferta=1" className="hover:text-signal">Ofertas</Link></li>
         </ul>
       </div>

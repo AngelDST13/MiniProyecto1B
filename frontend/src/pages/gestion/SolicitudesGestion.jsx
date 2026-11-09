@@ -1,7 +1,7 @@
 // Solicitudes de informe de los clientes: el admin revisa la vista previa y aprueba
 // (se envía por correo) o rechaza con un motivo.
 import { useCallback, useState } from 'react';
-import { Check, Eye, FileCheck, X } from 'lucide-react';
+import { Check, Eye, FileCheck, Sparkles, X } from 'lucide-react';
 import { gestionService } from '../../services/tiendaService.js';
 import { useCargaAsync } from '../../hooks/useCargaAsync.js';
 import { useToast } from '../../hooks/useToast.js';
@@ -23,6 +23,19 @@ const Revisar = ({ solicitud, onCerrar, onListo }) => {
   const [modo, setModo] = useState('aprobar');
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const [sugiriendo, setSugiriendo] = useState(false);
+
+  // Borrador de la nota redactado por la IA a partir de los datos de la orden (el admin lo revisa antes de enviar)
+  const sugerir = async () => {
+    setSugiriendo(true);
+    try {
+      setTexto((await gestionService.sugerirNota(solicitud.id)).data.nota);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setSugiriendo(false);
+    }
+  };
 
   const confirmar = async () => {
     setEnviando(true);
@@ -51,7 +64,10 @@ const Revisar = ({ solicitud, onCerrar, onListo }) => {
             </div>
             <TextArea id="texto-revision" label={modo === 'aprobar' ? 'Nota para el cliente (opcional)' : 'Motivo del rechazo'} maxLength={500}
               hint={modo === 'aprobar' ? 'Se incluye al inicio del informe.' : 'El cliente lo recibe por correo.'} value={texto} onChange={(e) => setTexto(e.target.value)} />
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
+              {modo === 'aprobar' && (
+                <Button variante="fantasma" icono={Sparkles} cargando={sugiriendo} onClick={sugerir} className="mr-auto">Redactar nota con IA</Button>
+              )}
               <Button variante="borde" onClick={onCerrar}>Cancelar</Button>
               <Button variante={modo === 'aprobar' ? 'senal' : 'peligro'} icono={modo === 'aprobar' ? Check : X} cargando={enviando} onClick={confirmar}
                 disabled={modo === 'rechazar' && texto.trim().length < 5}>

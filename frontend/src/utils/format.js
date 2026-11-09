@@ -1,8 +1,10 @@
 // Formateadores de datos para mostrar en pantalla.
-const LOCALE = 'es-EC';
-const MONEDA = 'USD';
+// Colones costarricenses: ₡659 900 (los céntimos solo se muestran cuando existen).
+export const LOCALE = 'es-CR';
+const MONEDA = 'CRC';
 
-const formatoMoneda = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: MONEDA });
+const formatoMoneda = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: MONEDA, maximumFractionDigits: 0 });
+const formatoMonedaExacto = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: MONEDA, minimumFractionDigits: 2 });
 const formatoFecha = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: 'short', year: 'numeric' });
 const formatoFechaHora = new Intl.DateTimeFormat(LOCALE, {
   day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
@@ -11,7 +13,13 @@ const formatoFechaHora = new Intl.DateTimeFormat(LOCALE, {
 // El backend envía "YYYY-MM-DD HH:mm:ss" (hora local del taller).
 const aFecha = (texto) => (texto ? new Date(String(texto).replace(' ', 'T')) : null);
 
-export const formatMoney = (valor) => formatoMoneda.format(Number(valor ?? 0));
+export const formatMoney = (valor) => {
+  const numero = Number(valor ?? 0);
+  return Number.isInteger(numero) ? formatoMoneda.format(numero) : formatoMonedaExacto.format(numero);
+};
+
+// Siempre con dos decimales (facturas)
+export const formatMoneyExacto = (valor) => formatoMonedaExacto.format(Number(valor ?? 0));
 
 export const formatDate = (texto) => {
   const fecha = aFecha(texto);

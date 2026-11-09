@@ -1,7 +1,11 @@
 // Constantes visuales de la tienda.
-import { Cpu, HardDrive, Headphones, Keyboard, Laptop, Monitor, MonitorSmartphone, Package, Wifi } from 'lucide-react';
+import {
+  Box, CircuitBoard, Cpu, Fan, Gpu, HardDrive, Headphones, Keyboard, Laptop, MemoryStick, Monitor, MonitorSmartphone, Package, PlugZap, Wifi,
+} from 'lucide-react';
 
-export const ICONOS_CATEGORIA = { Laptop, Monitor, Cpu, HardDrive, MonitorSmartphone, Keyboard, Headphones, Wifi, Package };
+export const ICONOS_CATEGORIA = {
+  Laptop, Monitor, Cpu, HardDrive, MonitorSmartphone, Keyboard, Headphones, Wifi, CircuitBoard, MemoryStick, Gpu, PlugZap, Box, Fan, Package,
+};
 
 // Fondo de la ilustración de cada categoría (cuando el producto no tiene foto)
 export const FONDO_CATEGORIA = {
@@ -13,6 +17,12 @@ export const FONDO_CATEGORIA = {
   Keyboard: 'from-[#3a2a12] to-st-diagnostico',
   Headphones: 'from-[#3a1830] to-[#c43d7a]',
   Wifi: 'from-[#132a33] to-[#1ba39c]',
+  CircuitBoard: 'from-[#102a1f] to-[#2f9e6a]',
+  MemoryStick: 'from-[#20193a] to-[#6c5ce7]',
+  Gpu: 'from-ink to-st-recibido',
+  PlugZap: 'from-[#3a2a12] to-[#e0a106]',
+  Box: 'from-[#1b1d24] to-st-entregado',
+  Fan: 'from-[#0f2b36] to-[#1fa4c4]',
   Package: 'from-ink-soft to-muted',
 };
 

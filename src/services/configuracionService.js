@@ -10,6 +10,22 @@ const ESQUEMA = {
   notificar_inicio_sesion: { tipo: 'booleano', etiqueta: 'Avisar por correo de inicios de sesión desde dispositivos nuevos' },
   tienda_costo_envio: { tipo: 'dinero', etiqueta: 'Costo de envío a domicilio' },
   tienda_envio_gratis_desde: { tipo: 'dinero', etiqueta: 'Envío gratis desde' },
+  // Datos de la empresa (encabezado de facturas, informes y correos)
+  empresa_nombre: { tipo: 'texto', etiqueta: 'Razón social' },
+  empresa_cedula_juridica: { tipo: 'texto', etiqueta: 'Cédula jurídica' },
+  empresa_telefono: { tipo: 'texto', etiqueta: 'Teléfono' },
+  empresa_correo: { tipo: 'texto', etiqueta: 'Correo de facturación' },
+  empresa_direccion: { tipo: 'texto', etiqueta: 'Dirección' },
+  empresa_iban: { tipo: 'texto', etiqueta: 'Cuenta IBAN' },
+  empresa_sinpe: { tipo: 'texto', etiqueta: 'Número SINPE Móvil' },
+  iva_porcentaje: { tipo: 'entero', etiqueta: 'IVA (%)' },
+  // Automatizaciones
+  auto_factura: { tipo: 'booleano', etiqueta: 'Emitir y enviar la factura al entregar un pedido o equipo' },
+  auto_vencer_garantias: { tipo: 'booleano', etiqueta: 'Marcar como vencidas las garantías que ya terminaron' },
+  auto_cancelar_pedidos_horas: { tipo: 'entero', etiqueta: 'Cancelar pedidos pendientes después de (horas, 0 = nunca)' },
+  auto_recordatorio_citas: { tipo: 'booleano', etiqueta: 'Recordar por correo las citas del día siguiente' },
+  auto_alerta_stock: { tipo: 'booleano', etiqueta: 'Avisar a los administradores cuando un producto se agota' },
+  informe_diario_ia: { tipo: 'booleano', etiqueta: 'Incluir análisis de IA en el informe diario' },
 };
 
 const validar = (clave, valor) => {
@@ -27,6 +43,14 @@ const validar = (clave, valor) => {
       const numero = Number(texto);
       if (!Number.isFinite(numero) || numero < 0) throw new AppError(`${regla.etiqueta}: debe ser un número mayor o igual a 0`, 400, 'VALIDATION_ERROR');
       return numero.toFixed(2);
+    }
+    case 'texto':
+      if (texto.length > 255) throw new AppError(`${regla.etiqueta}: máximo 255 caracteres`, 400, 'VALIDATION_ERROR');
+      return texto;
+    case 'entero': {
+      const numero = Number(texto);
+      if (!Number.isInteger(numero) || numero < 0 || numero > 10000) throw new AppError(`${regla.etiqueta}: debe ser un número entero entre 0 y 10000`, 400, 'VALIDATION_ERROR');
+      return String(numero);
     }
     case 'correos': {
       const correos = texto.split(/[,;\s]+/).filter(Boolean);
@@ -60,6 +84,17 @@ export const configuracion = {
       await pool.execute('INSERT INTO configuracion (clave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = VALUES(valor)', [clave, valor]);
     }
     return this.todas();
+  },
+
+  // Datos de la empresa listos para documentos y correos
+  async empresa() {
+    const [rows] = await pool.query("SELECT clave, valor FROM configuracion WHERE clave LIKE 'empresa\\_%' OR clave = 'iva_porcentaje'");
+    const v = Object.fromEntries(rows.map((r) => [r.clave, r.valor]));
+    return {
+      nombre: v.empresa_nombre ?? 'Bancada', cedulaJuridica: v.empresa_cedula_juridica ?? '', telefono: v.empresa_telefono ?? '',
+      correo: v.empresa_correo ?? '', direccion: v.empresa_direccion ?? '', iban: v.empresa_iban ?? '', sinpe: v.empresa_sinpe ?? '',
+      iva: Number(v.iva_porcentaje ?? 13),
+    };
   },
 
   // Valores internos (no editables desde el panel), por ejemplo la fecha del último informe enviado.

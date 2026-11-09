@@ -5,6 +5,7 @@ import { UsuarioModel } from '../../models/usuarioModel.js';
 import { configuracion } from '../configuracionService.js';
 import { enviarCorreo } from '../correo/correoService.js';
 import { correoInformeDiario } from '../correo/plantillas.js';
+import { iaDisponible, resumirDia } from '../agente/iaService.js';
 
 const ESTADOS = ['Recibido', 'En Diagnóstico', 'Reparado', 'Entregado'];
 const uno = async (sql, valores = []) => Object.values((await pool.execute(sql, valores))[0][0])[0];
@@ -36,11 +37,23 @@ export const recopilarDatosDelDia = async (fecha) => {
 };
 
 const fechaLegible = (dia) =>
-  new Intl.DateTimeFormat('es-EC', { dateStyle: 'full', timeZone: 'UTC' }).format(new Date(`${dia}T12:00:00Z`));
+  new Intl.DateTimeFormat('es-CR', { dateStyle: 'full', timeZone: 'UTC' }).format(new Date(`${dia}T12:00:00Z`));
 
-export const generarInformeDiario = async (fecha) => {
+// Párrafo de IA opcional: si falla (sin saldo, sin conexión) el informe sale igual, sin esa sección.
+const analisisDelDia = async (datos) => {
+  if (!iaDisponible() || !(await configuracion.activo('informe_diario_ia'))) return null;
+  try {
+    return await resumirDia(datos);
+  } catch (error) {
+    console.warn('[informe diario] sin análisis de IA:', error.message);
+    return null;
+  }
+};
+
+export const generarInformeDiario = async (fecha, { conIA = true } = {}) => {
   const datos = await recopilarDatosDelDia(fecha);
-  return { datos, ...correoInformeDiario({ fecha: fechaLegible(datos.fecha), datos }) };
+  const analisisIA = conIA ? await analisisDelDia(datos) : null;
+  return { datos, analisisIA, ...correoInformeDiario({ fecha: fechaLegible(datos.fecha), datos, analisisIA }) };
 };
 
 const destinatarios = async () => {
@@ -59,4 +72,4 @@ export const enviarInformeDiario = async (fecha) => {
 
 // Hora actual "HH:MM" en la zona horaria del taller
 export const horaLocal = () =>
-  new Intl.DateTimeFormat('es-EC', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: env.zonaHoraria }).format(new Date());
+  new Intl.DateTimeFormat('es-CR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: env.zonaHoraria }).format(new Date());

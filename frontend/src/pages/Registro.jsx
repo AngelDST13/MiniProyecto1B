@@ -79,7 +79,7 @@ export const Registro = () => {
   }
 
   // Aviso inmediato mientras se escribe la cédula (el backend la vuelve a validar)
-  const avisoCedula = valores.cedula.length === 10 && !cedulaValida(valores.cedula) ? 'Esta cédula no es válida' : undefined;
+  const avisoCedula = valores.cedula.replace(/\D/g, '').length >= 9 && !cedulaValida(valores.cedula) ? 'Usa tu cédula física (9 dígitos), jurídica (10) o DIMEX' : undefined;
   const hayErrorDeCampo = ['nombre', 'cedula', 'telefono', 'correo', 'password', 'confirmar'].some((c) => errores[c]);
 
   return (
@@ -88,9 +88,9 @@ export const Registro = () => {
         <TextInput id="nombre" name="nombre" label="Nombre completo" autoComplete="name" placeholder="Ana Martínez"
           value={valores.nombre} onChange={cambiar} error={errores.nombre} required />
         <div className="grid gap-3 sm:grid-cols-2">
-          <TextInput id="cedula" name="cedula" label="Cédula" inputMode="numeric" maxLength={10} placeholder="1712345678"
+          <TextInput id="cedula" name="cedula" label="Cédula" inputMode="numeric" maxLength={14} placeholder="1-0234-0567"
             value={valores.cedula} onChange={cambiar} error={errores.cedula ?? avisoCedula} required />
-          <TextInput id="telefono" name="telefono" type="tel" label="Teléfono" autoComplete="tel" placeholder="0991234567"
+          <TextInput id="telefono" name="telefono" type="tel" label="Teléfono" autoComplete="tel" placeholder="8888-8888"
             value={valores.telefono} onChange={cambiar} error={errores.telefono} required />
         </div>
         <TextInput id="correo" name="correo" type="email" label="Correo" autoComplete="email" placeholder="ana@correo.com"

@@ -66,7 +66,7 @@ export const MODULOS_PERSONALIZADOS = [
 const REFERENCIAS_EXTERNAS = {
   clientes: {
     tabla: 'clientes',
-    etiqueta: (a) => `CONCAT(${a}.nombre, ' · CI ', ${a}.cedula)`,
+    etiqueta: (a) => `CONCAT(${a}.nombre, ' · Céd. ', ${a}.cedula)`,
     orden: 't.nombre',
   },
   ordenes: {
